@@ -41,7 +41,10 @@ SET(CMAKE_MODULE_PATH
     "${CMAKE_SOURCE_DIR}/cmake/modules/"
     )
 
-FIND_PACKAGE(SQLITE3 REQUIRED)
+FIND_PACKAGE(Music REQUIRED)
+#FIND_PACKAGE(SQLITE3 REQUIRED)
+#used for matrix multiplication, maybe for fft, too
+FIND_PACKAGE(Eigen3 3.0.0 REQUIRED)
 #use doxygen for documentation. don't need this for compilation.
 FIND_PACKAGE(Doxygen)
 
@@ -70,7 +73,9 @@ SET(
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${SQLITE_INCLUDE_DIRS}
+    ${SQLITE3_INCLUDE_DIR}
+    ${MUSIC_INCLUDE_DIR}
+    ${EIGEN3_INCLUDE_DIR}
     src/
     )
 
