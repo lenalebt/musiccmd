@@ -1,9 +1,8 @@
 #ifndef PROGRAMOPTIONS_HPP
 #define PROGRAMOPTIONS_HPP
 
-#include <boost/program_options.hpp>
-
-namespace po = boost::program_options;
+#include <string>
+#include <vector>
 
 /**
  * @brief Parses the program options from the command line.
@@ -15,9 +14,41 @@ namespace po = boost::program_options;
  * @param argv The argument values
  * @param vm The variables map of the parsed program options.
  * 
- * @return <code>0</code> if everything went fine, <code>ERROR_CODE</code> to return from
- *      <code>int main()</code> otherwise.
+ * @return <code>EXIT_SUCCESS</code> if everything went fine, <code>EXIT_FAILURE</code>
+ *      otherwise.
  */
-int parseProgramOptions(int argc, char* argv[], po::variables_map& vm);
+int parseProgramOptions(int argc, char* argv[]);
 
+
+class ProgramOptions
+{
+private:
+    static ProgramOptions* instance;
+    ProgramOptions();
+protected:
+    
+public:
+    static ProgramOptions* getInstance();
+    
+    unsigned int verbosity_level;
+    
+    std::string dbfile;
+    
+    bool test;
+    std::string testParameter;
+    
+    //options for adding files
+    bool addfile;
+    std::vector<std::string> addfileParameter;
+    
+    bool addfolder;
+    std::vector<std::string> addfolderParameter;
+    
+    //options for database queries
+    bool searchartist;
+    std::string searchartistParameter;
+    
+    bool searchtitle;
+    std::string searchtitleParameter;
+};
 #endif      //PROGRAMOPTIONS_HPP

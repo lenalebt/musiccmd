@@ -5,22 +5,38 @@
 #include "music.hpp"
 
 #include "programoptions.hpp"
+#include "logging.hpp"
 
 using namespace std;
+using namespace music;
 
 int main(int argc, char *argv[])
 {
-    po::variables_map vm;
-	if (parseProgramOptions(argc, argv, vm) != EXIT_SUCCESS)
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    
+	if (parseProgramOptions(argc, argv) != EXIT_SUCCESS)
         return EXIT_FAILURE;
     
     //run program tests before doing anything else.
-    if (vm.count("test"))
+    if (pOpt->test)
     {
-        return runTest(vm["test"].as<std::string>());
+        return runTest(pOpt->testParameter);
     }
     
+    VERBOSE(3, "open database file \"" << pOpt->dbfile << "\"");
+    DatabaseConnection* conn = new SQLiteDatabaseConnection();
+    conn->open(pOpt->dbfile);
+    
     //TODO: first run adding files/folders
+    //first add files, then add folders
+    if (pOpt->addfile)
+    {
+        std::vector<std::string>* files = &pOpt->addfileParameter;
+        for (std::vector<std::string>::const_iterator it = files->begin(); it != files->end(); it++)
+        {
+            std::cerr << *it << std::endl;
+        }
+    }
     //TODO: then run querying, etc.
     
     return EXIT_SUCCESS;

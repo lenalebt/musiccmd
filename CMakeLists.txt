@@ -63,7 +63,10 @@ SET(
     #src/
     src/main.cpp
     src/programoptions.cpp
-    src/console_colors.cpp
+    
+    #src/tools/
+    src/tools/console_colors.cpp
+    src/tools/logging.cpp
     
     #src/debug/
     src/tests/debug.cpp
@@ -76,7 +79,10 @@ SET(
     #src/
     src/main.hpp
     src/programoptions.hpp
-    src/console_colors.hpp
+    
+    #src/tools/
+    src/tools/console_colors.hpp
+    src/tools/logging.hpp
     
     #src/debug/
     src/tests/debug.hpp
@@ -102,6 +108,7 @@ INCLUDE_DIRECTORIES(
     ${Boost_INCLUDE_DIR}
     src/
     src/tests/
+    src/tools/
     )
 
 #to copy a directory (e.g. test files) to another.
