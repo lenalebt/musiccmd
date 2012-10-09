@@ -6,6 +6,10 @@
 
 #include "programoptions.hpp"
 #include "logging.hpp"
+#include "debug.hpp"
+
+#include "addcontent.hpp"
+#include "querycontent.hpp"
 
 using namespace std;
 using namespace music;
@@ -23,20 +27,26 @@ int main(int argc, char *argv[])
         return runTest(pOpt->testParameter);
     }
     
-    VERBOSE(3, "open database file \"" << pOpt->dbfile << "\"");
+    VERBOSE(3, "open database file \"" << pOpt->dbfile << "\"" << std::endl);
     DatabaseConnection* conn = new SQLiteDatabaseConnection();
     conn->open(pOpt->dbfile);
     
+    FilePreprocessor proc;
+    
     //TODO: first run adding files/folders
     //first add files, then add folders
-    if (pOpt->addfile)
+    if (!addfiles(conn, proc))
     {
-        std::vector<std::string>* files = &pOpt->addfileParameter;
-        for (std::vector<std::string>::const_iterator it = files->begin(); it != files->end(); it++)
-        {
-            std::cerr << *it << std::endl;
-        }
+        ERROR_OUT("failed to add files. aborting.", 0);
+        return EXIT_FAILURE;
     }
+    
+    if (!addfolders(conn, proc))
+    {
+        ERROR_OUT("failed to add folders. aborting.", 0);
+        return EXIT_FAILURE;
+    }
+    
     //TODO: then run querying, etc.
     
     return EXIT_SUCCESS;

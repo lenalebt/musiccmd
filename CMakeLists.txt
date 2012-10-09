@@ -64,6 +64,10 @@ SET(
     src/main.cpp
     src/programoptions.cpp
     
+    #src/db/
+    src/db/addcontent.cpp
+    src/db/querycontent.cpp
+    
     #src/tools/
     src/tools/console_colors.cpp
     src/tools/logging.cpp
@@ -79,6 +83,10 @@ SET(
     #src/
     src/main.hpp
     src/programoptions.hpp
+    
+    #src/db/
+    src/db/addcontent.hpp
+    src/db/querycontent.hpp
     
     #src/tools/
     src/tools/console_colors.hpp
@@ -109,6 +117,7 @@ INCLUDE_DIRECTORIES(
     src/
     src/tests/
     src/tools/
+    src/db/
     )
 
 #to copy a directory (e.g. test files) to another.

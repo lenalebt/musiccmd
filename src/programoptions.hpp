@@ -20,6 +20,15 @@
 int parseProgramOptions(int argc, char* argv[]);
 
 
+/**
+ * @brief This class holds the program options
+ * 
+ * It is implemented as a singleton class.
+ * 
+ * @attention Expect every function to have knowledge about this object.
+ *      Some functions don't need extra parameters as they extract it from
+ *      here.
+ */
 class ProgramOptions
 {
 private:
@@ -50,5 +59,8 @@ public:
     
     bool searchtitle;
     std::string searchtitleParameter;
+    
+    bool searchfilename;
+    std::string searchfilenameParameter;
 };
 #endif      //PROGRAMOPTIONS_HPP

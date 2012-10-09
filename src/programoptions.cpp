@@ -44,6 +44,9 @@ int parseProgramOptions(int argc, char* argv[])
         ("search-title",  po::value<std::string>(&pOpt->searchtitleParameter),
             "Search for all recordings with given title. You may use "
             "wildcards \"*\" and \"?\".")
+        ("search-filename",  po::value<std::string>(&pOpt->searchfilenameParameter),
+            "Search for all file names containing the search string. You may use "
+            "wildcards \"*\" and \"?\".")
         ;
     //NOTE: on wildcards: simply replace * by % and ? by _, feed it to the DB.
     
@@ -85,6 +88,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->searchartist = true;
     if (vm.count("searchtitle"))
         pOpt->searchtitle = true;
+    if (vm.count("searchfilename"))
+        pOpt->searchfilename = true;
     
     return EXIT_SUCCESS;
 }
@@ -109,7 +114,10 @@ ProgramOptions::ProgramOptions() :
     searchartistParameter(""),
     
     searchtitle(false),
-    searchtitleParameter("")
+    searchtitleParameter(""),
+    
+    searchfilename(false),
+    searchfilenameParameter("")
     
     
 {
