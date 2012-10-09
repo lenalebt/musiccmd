@@ -35,19 +35,37 @@ int main(int argc, char *argv[])
     
     //TODO: first run adding files/folders
     //first add files, then add folders
-    if (!addfiles(conn, proc))
+    if (!add_file(conn, proc))
     {
         ERROR_OUT("failed to add files. aborting.", 0);
         return EXIT_FAILURE;
     }
     
-    if (!addfolders(conn, proc))
+    if (!add_folder(conn, proc))
     {
         ERROR_OUT("failed to add folders. aborting.", 0);
         return EXIT_FAILURE;
     }
     
     //TODO: then run querying, etc.
+    
+    if (!search_artist(conn))
+    {
+        ERROR_OUT("failed to search for artist. aborting.", 0);
+        return EXIT_FAILURE;
+    }
+    
+    if (!search_title(conn))
+    {
+        ERROR_OUT("failed to search for title. aborting.", 0);
+        return EXIT_FAILURE;
+    }
+    
+    if (!search_filename(conn))
+    {
+        ERROR_OUT("failed to search for filename. aborting.", 0);
+        return EXIT_FAILURE;
+    }
     
     return EXIT_SUCCESS;
 }

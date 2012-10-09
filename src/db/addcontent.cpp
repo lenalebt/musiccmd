@@ -5,15 +5,18 @@
 
 #include "programoptions.hpp"
 #include "logging.hpp"
+#include "debug.hpp"
 
-bool addfiles(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
+using namespace music;
+
+bool add_file(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
-    if (pOpt->addfile)
+    if (pOpt->add_file)
     {
         VERBOSE(0, "add files to database." << std::endl);
-        std::vector<std::string>* files = &pOpt->addfileParameter;
-        music::databaseentities::id_datatype recordingID;
+        std::vector<std::string>* files = &pOpt->add_fileParameter;
+        databaseentities::id_datatype recordingID;
         for (std::vector<std::string>::const_iterator it = files->begin(); it != files->end(); it++)
         {
             //check if the file already is in the database...
@@ -32,10 +35,10 @@ bool addfiles(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
     
     return true;
 }
-bool addfolders(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
+bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
-    if (pOpt->addfolder)
+    if (pOpt->add_folder)
     {
         ERROR_OUT("not yet implemented: adding folders", 0);
     }

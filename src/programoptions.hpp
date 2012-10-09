@@ -47,20 +47,20 @@ public:
     std::string testParameter;
     
     //options for adding files
-    bool addfile;
-    std::vector<std::string> addfileParameter;
+    bool add_file;
+    std::vector<std::string> add_fileParameter;
     
-    bool addfolder;
-    std::vector<std::string> addfolderParameter;
+    bool add_folder;
+    std::vector<std::string> add_folderParameter;
     
     //options for database queries
-    bool searchartist;
-    std::string searchartistParameter;
+    bool search_artist;
+    std::string search_artistParameter;
     
-    bool searchtitle;
-    std::string searchtitleParameter;
+    bool search_title;
+    std::string search_titleParameter;
     
-    bool searchfilename;
-    std::string searchfilenameParameter;
+    bool search_filename;
+    std::string search_filenameParameter;
 };
 #endif      //PROGRAMOPTIONS_HPP

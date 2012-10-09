@@ -3,7 +3,7 @@
 
 #include "music.hpp"
 
-bool addfiles(music::DatabaseConnection* conn, music::FilePreprocessor& proc);
-bool addfolders(music::DatabaseConnection* conn, music::FilePreprocessor& proc);
+bool add_file(music::DatabaseConnection* conn, music::FilePreprocessor& proc);
+bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc);
 
 #endif //DB_ADDCONTENT_HPP

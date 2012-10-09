@@ -25,10 +25,10 @@ int parseProgramOptions(int argc, char* argv[])
     
     po::options_description optAddFiles("Options for adding files to the database");
     optAddFiles.add_options()
-        ("addfile,a", po::value<std::vector<std::string> >(&pOpt->addfileParameter)->composing()->multitoken(),
+        ("add-file,a", po::value<std::vector<std::string> >(&pOpt->add_fileParameter)->composing()->multitoken(),
             "Add specific files to the database. You may specify more "
             "than one file.")
-        ("addfolder,A", po::value<std::vector<std::string> >(&pOpt->addfolderParameter)->composing()->multitoken(),
+        ("add-folder,A", po::value<std::vector<std::string> >(&pOpt->add_folderParameter)->composing()->multitoken(),
             "Add all files from a folder to the database.  You may specify "
             "more than one folder.")
         ;
@@ -38,13 +38,13 @@ int parseProgramOptions(int argc, char* argv[])
         ("verbose-dbinfo,i", po::value<unsigned int>()->implicit_value(1)->default_value(0),
             "Set verbosity level for database queries. Higher numbers indicate "
             "more verbose output.")
-        ("search-artist", po::value<std::string>(&pOpt->searchartistParameter),
+        ("search-artist", po::value<std::string>(&pOpt->search_artistParameter),
             "Search for all recordings from an artist. You may use "
             "wildcards \"*\" and \"?\".")
-        ("search-title",  po::value<std::string>(&pOpt->searchtitleParameter),
+        ("search-title",  po::value<std::string>(&pOpt->search_titleParameter),
             "Search for all recordings with given title. You may use "
             "wildcards \"*\" and \"?\".")
-        ("search-filename",  po::value<std::string>(&pOpt->searchfilenameParameter),
+        ("search-filename",  po::value<std::string>(&pOpt->search_filenameParameter),
             "Search for all file names containing the search string. You may use "
             "wildcards \"*\" and \"?\".")
         ;
@@ -80,16 +80,16 @@ int parseProgramOptions(int argc, char* argv[])
     
     if (vm.count("test"))
         pOpt->test = true;
-    if (vm.count("addfile"))
-        pOpt->addfile = true;
-    if (vm.count("addfolder"))
-        pOpt->addfolder = true;
-    if (vm.count("searchartist"))
-        pOpt->searchartist = true;
-    if (vm.count("searchtitle"))
-        pOpt->searchtitle = true;
-    if (vm.count("searchfilename"))
-        pOpt->searchfilename = true;
+    if (vm.count("add-file"))
+        pOpt->add_file = true;
+    if (vm.count("add-folder"))
+        pOpt->add_folder = true;
+    if (vm.count("search-artist"))
+        pOpt->search_artist = true;
+    if (vm.count("search-title"))
+        pOpt->search_title = true;
+    if (vm.count("search-filename"))
+        pOpt->search_filename = true;
     
     return EXIT_SUCCESS;
 }
@@ -104,20 +104,20 @@ ProgramOptions::ProgramOptions() :
     test(false),
     testParameter(""),
     
-    addfile(false),
-    addfileParameter(),
+    add_file(false),
+    add_fileParameter(),
     
-    addfolder(false),
-    addfolderParameter(),
+    add_folder(false),
+    add_folderParameter(),
     
-    searchartist(false),
-    searchartistParameter(""),
+    search_artist(false),
+    search_artistParameter(""),
     
-    searchtitle(false),
-    searchtitleParameter(""),
+    search_title(false),
+    search_titleParameter(""),
     
-    searchfilename(false),
-    searchfilenameParameter("")
+    search_filename(false),
+    search_filenameParameter("")
     
     
 {
