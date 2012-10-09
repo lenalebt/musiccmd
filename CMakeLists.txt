@@ -60,13 +60,27 @@ FIND_PACKAGE(Boost 1.46.1
 #place source files here
 SET(
     musiccmd_SOURCES
+    #src/
     src/main.cpp
+    src/programoptions.cpp
+    src/console_colors.cpp
+    
+    #src/debug/
+    src/tests/debug.cpp
+    src/tests/testframework.cpp
     )
 
 #place header here
 SET(
     musiccmd_HEADERS
+    #src/
     src/main.hpp
+    src/programoptions.hpp
+    src/console_colors.hpp
+    
+    #src/debug/
+    src/tests/debug.hpp
+    src/tests/testframework.hpp
     )
 
 #put all (possibly autocreated) headers and source files here
@@ -87,6 +101,7 @@ INCLUDE_DIRECTORIES(
     ${EIGEN3_INCLUDE_DIR}
     ${Boost_INCLUDE_DIR}
     src/
+    src/tests/
     )
 
 #to copy a directory (e.g. test files) to another.
