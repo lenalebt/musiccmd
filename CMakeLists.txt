@@ -1,14 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 #project name
-PROJECT(music)
+PROJECT(musiccmd)
 
 #version number
-SET (music_VERSION_MAJOR 0)
-SET (music_VERSION_MINOR 01)
+SET (musiccmd_VERSION_MAJOR 0)
+SET (musiccmd_VERSION_MINOR 01)
 
 #tell the compiler to include the version number as preprocessor directive
-ADD_DEFINITIONS(-DVERSION=${music_VERSION_MAJOR}.${music_VERSION_MINOR})
+ADD_DEFINITIONS(-DVERSION=${musiccmd_VERSION_MAJOR}.${musiccmd_VERSION_MINOR})
 
 #this was mainly done to understand cmake
 MESSAGE ( "Choose build type by typing \"cmake -DCMAKE_BUILD_TYPE=Debug\" or \"cmake -DCMAKE_BUILD_TYPE=Release\" or \"cmake -DCMAKE_BUILD_TYPE=Profiling\".")
@@ -48,27 +48,36 @@ FIND_PACKAGE(Eigen3 3.0.0 REQUIRED)
 #use doxygen for documentation. don't need this for compilation.
 FIND_PACKAGE(Doxygen)
 
+SET(Boost_USE_MULTITHREADED ON)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+
+set(Boost_ADDITIONAL_VERSIONS "1.40.1" "1.44" "1.44.0" "1.46" "1.46.0" "1.46.1")
+FIND_PACKAGE(Boost 1.46.1
+    COMPONENTS
+    program_options
+    REQUIRED)
+
 #place source files here
 SET(
-    music_SOURCES
+    musiccmd_SOURCES
     src/main.cpp
     )
 
 #place header here
 SET(
-    music_HEADERS
+    musiccmd_HEADERS
     src/main.hpp
     )
 
 #put all (possibly autocreated) headers and source files here
 SET(
-    music_ALL_SOURCES
-    ${music_SOURCES}
+    musiccmd_ALL_SOURCES
+    ${musiccmd_SOURCES}
     )
 
 SET(
-    music_ALL_HEADERS
-    ${music_HEADERS}
+    musiccmd_ALL_HEADERS
+    ${musiccmd_HEADERS}
     )    
 
 INCLUDE_DIRECTORIES(
@@ -76,6 +85,7 @@ INCLUDE_DIRECTORIES(
     ${SQLITE3_INCLUDE_DIR}
     ${MUSIC_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIR}
     src/
     )
 
@@ -84,15 +94,15 @@ INCLUDE_DIRECTORIES(
 
 IF(DOXYGEN_FOUND)
     #convert semicolon-seperated list to whitespace-seperated one
-    FOREACH(ARG ${music_HEADERS})
-        SET(music_HEADERS_WHITESPACE "${music_HEADERS_WHITESPACE} ${CMAKE_CURRENT_SOURCE_DIR}/${ARG}")
-    ENDFOREACH(ARG ${music_HEADERS})
-    FOREACH(ARG ${music_SOURCES})
-        SET(music_SOURCES_WHITESPACE "${music_SOURCES_WHITESPACE} ${CMAKE_CURRENT_SOURCE_DIR}/${ARG}")
-    ENDFOREACH(ARG ${music_SOURCES})
+    FOREACH(ARG ${musiccmd_HEADERS})
+        SET(musiccmd_HEADERS_WHITESPACE "${musiccmd_HEADERS_WHITESPACE} ${CMAKE_CURRENT_SOURCE_DIR}/${ARG}")
+    ENDFOREACH(ARG ${musiccmd_HEADERS})
+    FOREACH(ARG ${musiccmd_SOURCES})
+        SET(musiccmd_SOURCES_WHITESPACE "${musiccmd_SOURCES_WHITESPACE} ${CMAKE_CURRENT_SOURCE_DIR}/${ARG}")
+    ENDFOREACH(ARG ${musiccmd_SOURCES})
     GET_DIRECTORY_PROPERTY(DIRINC INCLUDE_DIRECTORIES)
     FOREACH(ARG ${DIRINC})
-        SET(music_INCLUDES_WHITESPACE "${music_INCLUDES_WHITESPACE} ${ARG}")
+        SET(musiccmd_INCLUDES_WHITESPACE "${musiccmd_INCLUDES_WHITESPACE} ${ARG}")
     ENDFOREACH(ARG ${DIRINC})
     
     #add configuration file
@@ -111,14 +121,14 @@ ENDIF()
 
 #add executable files for our project
 ADD_EXECUTABLE(
-    music
-    ${music_ALL_SOURCES}
-    ${music_ALL_HEADERS_MOC}
+    musiccmd
+    ${musiccmd_ALL_SOURCES}
+    ${musiccmd_ALL_HEADERS_MOC}
     )
 
 #add unit tests here
 ENABLE_TESTING()
-ADD_TEST(tmp                  "music" "--test" "tmp")
+ADD_TEST(tmp                  "musiccmd" "--test" "tmp")
 #use "make test" to start all tests.
 
 #use this to automatically create installation packages for different platforms
@@ -144,7 +154,7 @@ ENDIF(UNIX)
 
 #meta data
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
-    "music is a MUsic SImilarity Classifier"
+    "musiccmd is a MUsic SImilarity Classifier"
     )
 SET(CPACK_PACKAGE_VENDOR
     "-"
@@ -156,10 +166,10 @@ SET(CPACK_RESOURCE_FILE_LICENSE
     #"${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT"
     )
 SET(CPACK_PACKAGE_VERSION_MAJOR
-    ${music_VERSION_MAJOR}
+    ${musiccmd_VERSION_MAJOR}
     )
 SET(CPACK_PACKAGE_VERSION_MINOR
-    ${music_VERSION_MINOR}
+    ${musiccmd_VERSION_MINOR}
     )
 SET(CPACK_PACKAGE_CONTACT
     "lbruder@rim.com"
@@ -169,7 +179,7 @@ SET(CPACK_DEBIAN_PACKAGE_MAINTAINER
     )
 #maybe set something better here
 SET(CPACK_PACKAGE_SECTION
-    "music"
+    "musiccmd"
     )
 SET(CPACK_SOURCE_IGNORE_FILES
     ${CMAKE_BINARY_DIR}/*
@@ -181,11 +191,13 @@ INCLUDE(CPack)
 
 
 #tell the linker which libs need to be linked
-TARGET_LINK_LIBRARIES(music
+TARGET_LINK_LIBRARIES(musiccmd
     ${SQLITE3_LIBRARIES}
+    ${MUSIC_LIBRARIES}
+    ${Boost_LIBRARIES}
     )
 
-INSTALL (TARGETS music
+INSTALL (TARGETS musiccmd
     DESTINATION bin
     )
 
