@@ -4,23 +4,28 @@
 
 int parseProgramOptions(int argc, char* argv[], po::variables_map& vm)
 {
-    po::options_description optAll("All options:");
+    po::options_description optAll("All options");
     
-    po::options_description optGlobal("Global options:");
+    po::options_description optGlobal("Global options");
     optGlobal.add_options()
         ("help,h", "Show help message and exit.")
         ("dbfile", po::value<std::string>()->default_value("database.db"),
             "Set database file (where to store results etc.).")
         ("version,v", "Show version number and exit.")
+        ("test", po::value<std::string>(), "Run test with given name.")
         ;
     
-    po::options_description optAddFiles("Options for adding files to the database:");
+    po::options_description optAddFiles("Options for adding files to the database");
     optAddFiles.add_options()
-        ("addfile,a", po::value<std::vector<std::string> >(), "Add specific files to the database. You may specify more than one file.")
-        ("addfolder,A", po::value<std::vector<std::string> >()->composing(), "Add all files from a folder to the database.  You may specify more than one folder.")
+        ("addfile,a", po::value<std::vector<std::string> >(),
+            "Add specific files to the database. You may specify more "
+            "than one file.")
+        ("addfolder,A", po::value<std::vector<std::string> >()->composing(),
+            "Add all files from a folder to the database.  You may specify "
+            "more than one folder.")
         ;
     
-    po::options_description optQueryDB("Options for querying the database:");
+    po::options_description optQueryDB("Options for querying the database");
     optQueryDB.add_options()
         ("verbose-dbinfo,i", po::value<unsigned int>()->implicit_value(0),
             "Set verbosity level for database queries. Higher numbers indicate "
