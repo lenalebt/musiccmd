@@ -43,10 +43,12 @@ bool clean_db(music::DatabaseConnection* conn)
                 VERBOSE_DB(0, "file does not exist: \"" << rec.getFilename() << "\", removing from database..."
                     << std::endl << "details:" << std::endl);
                 displayRecordingDetails(rec);
-                //TODO: REMOVE CONTENT (NO DB ACCESS YET FOR REMOVING)
+                
                 conn->deleteCategoryExampleScoresByRecordingID(recordingID);
                 conn->deleteRecordingToCategoryScoresByRecordingID(recordingID);
                 conn->deleteRecordingByID(recordingID);
+                //TODO: Remove orphaned artists, albums, ...
+                
                 VERBOSE_DB(0, std::endl);
             }
             else
