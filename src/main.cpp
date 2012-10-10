@@ -9,6 +9,7 @@
 #include "debug.hpp"
 
 #include "addcontent.hpp"
+#include "removecontent.hpp"
 #include "querycontent.hpp"
 
 using namespace std;
@@ -33,7 +34,6 @@ int main(int argc, char *argv[])
     
     FilePreprocessor proc;
     
-    //TODO: first run adding files/folders
     //first add files, then add folders
     if (!add_file(conn, proc))
     {
@@ -47,21 +47,19 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    //TODO: then run querying, etc.
-    
-    if (!search_artist(conn))
+    if (!search_artist_album_title(conn))
     {
         ERROR_OUT("failed to search for artist. aborting.", 0);
         return EXIT_FAILURE;
     }
     
-    if (!search_title(conn))
+    if (!search_filename(conn))
     {
-        ERROR_OUT("failed to search for title. aborting.", 0);
+        ERROR_OUT("failed to search for filename. aborting.", 0);
         return EXIT_FAILURE;
     }
     
-    if (!search_filename(conn))
+    if (!clean_db(conn))
     {
         ERROR_OUT("failed to search for filename. aborting.", 0);
         return EXIT_FAILURE;

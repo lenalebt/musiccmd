@@ -66,11 +66,13 @@ SET(
     
     #src/db/
     src/db/addcontent.cpp
+    src/db/removecontent.cpp
     src/db/querycontent.cpp
     
     #src/tools/
     src/tools/console_colors.cpp
     src/tools/logging.cpp
+    src/tools/stringhelper.cpp
     
     #src/debug/
     src/tests/debug.cpp
@@ -86,11 +88,13 @@ SET(
     
     #src/db/
     src/db/addcontent.hpp
+    src/db/removecontent.hpp
     src/db/querycontent.hpp
     
     #src/tools/
     src/tools/console_colors.hpp
     src/tools/logging.hpp
+    src/tools/stringhelper.hpp
     
     #src/debug/
     src/tests/debug.hpp

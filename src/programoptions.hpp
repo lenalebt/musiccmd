@@ -35,11 +35,20 @@ private:
     static ProgramOptions* instance;
     ProgramOptions();
 protected:
-    
+    void replaceWildcards(std::string& str);
 public:
     static ProgramOptions* getInstance();
+    /**
+     * @brief Replaces all non-SQL-wildcards by SQL-wildcards
+     * 
+     * <code>* -> %</code>, <code>? -> _</code>
+     * 
+     * @return 
+     */
+    void replaceAllWildcards();
     
     unsigned int verbosity_level;
+    unsigned int db_verbosity_level;
     
     std::string dbfile;
     
@@ -57,10 +66,15 @@ public:
     bool search_artist;
     std::string search_artistParameter;
     
+    bool search_album;
+    std::string search_albumParameter;
+    
     bool search_title;
     std::string search_titleParameter;
     
     bool search_filename;
     std::string search_filenameParameter;
+    
+    bool clean_db;
 };
 #endif      //PROGRAMOPTIONS_HPP

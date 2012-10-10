@@ -3,8 +3,7 @@
 
 #include "music.hpp"
 
-bool search_artist(music::DatabaseConnection* conn);
-bool search_title(music::DatabaseConnection* conn);
+bool search_artist_album_title(music::DatabaseConnection* conn);
 bool search_filename(music::DatabaseConnection* conn);
 
 void displayRecordingDetails(const music::databaseentities::Recording& rec);
