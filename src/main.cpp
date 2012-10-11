@@ -38,32 +38,46 @@ int main(int argc, char *argv[])
     if (!add_file(conn, proc))
     {
         ERROR_OUT("failed to add files. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
         return EXIT_FAILURE;
     }
     
     if (!add_folder(conn, proc))
     {
         ERROR_OUT("failed to add folders. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
         return EXIT_FAILURE;
     }
     
     if (!search_artist_album_title(conn))
     {
         ERROR_OUT("failed to search for artist. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
         return EXIT_FAILURE;
     }
     
     if (!search_filename(conn))
     {
         ERROR_OUT("failed to search for filename. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
         return EXIT_FAILURE;
     }
     
     if (!clean_db(conn))
     {
         ERROR_OUT("failed to search for filename. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
         return EXIT_FAILURE;
     }
+    
+    VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+    conn->close();
+    delete conn;
     
     return EXIT_SUCCESS;
 }
