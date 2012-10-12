@@ -9,6 +9,7 @@
 #include "debug.hpp"
 
 #include "addcontent.hpp"
+#include "editcontent.hpp"
 #include "removecontent.hpp"
 #include "querycontent.hpp"
 
@@ -54,6 +55,14 @@ int main(int argc, char *argv[])
     if (!add_category(conn))
     {
         ERROR_OUT("failed to add category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
+    if (!edit_category(conn))
+    {
+        ERROR_OUT("failed to edit category. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
         conn->close();
         return EXIT_FAILURE;

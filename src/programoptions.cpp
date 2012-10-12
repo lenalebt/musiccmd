@@ -40,7 +40,7 @@ int parseProgramOptions(int argc, char* argv[])
     optClassification.add_options()
         ("add-category", po::value<std::string>(&pOpt->add_categoryParameter),
             "Add a category with the given name.")
-        ("edit-category", po::value<std::string>(&pOpt->edit_categoryParameter),
+        ("edit-category", po::value<std::vector<std::string> >(&pOpt->edit_categoryParameter)->multitoken(),
             "Edits a category with the given name. you need to specify additional parameters:\n"
             "   add-positive searchparams\n"
             "   add-negative searchparams\n"
@@ -65,7 +65,11 @@ int parseProgramOptions(int argc, char* argv[])
             "   title  t\n"
             "   artist a\n"
             "   album  b\n"
-            " You may use wildcards \"*\" and \"?\".")
+            "You may use wildcards \"*\" and \"?\"."
+            "The order of the elements is not relevant.\n"
+            "Example:\n"
+            "  \t./musiccmd --search artist \'*freelance*\' title starring\n"
+            "would find the song \"Starring\" by \"Freelance Whales\".")
         ("search-filename",  po::value<std::string>(&pOpt->search_filenameParameter),
             "Search for all file names containing the search string.")
         ;
@@ -107,6 +111,8 @@ int parseProgramOptions(int argc, char* argv[])
     
     if (vm.count("add-category"))
         pOpt->add_category = true;
+    if (vm.count("edit-category"))
+        pOpt->edit_category = true;
     if (vm.count("show-category"))
         pOpt->show_category = true;
     if (vm.count("remove-category"))

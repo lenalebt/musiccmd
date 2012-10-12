@@ -66,6 +66,7 @@ SET(
     
     #src/db/
     src/db/addcontent.cpp
+    src/db/editcontent.cpp
     src/db/removecontent.cpp
     src/db/querycontent.cpp
     
@@ -88,6 +89,7 @@ SET(
     
     #src/db/
     src/db/addcontent.hpp
+    src/db/editcontent.hpp
     src/db/removecontent.hpp
     src/db/querycontent.hpp
     
@@ -163,7 +165,7 @@ ADD_EXECUTABLE(
 
 #add unit tests here
 ENABLE_TESTING()
-ADD_TEST(tmp                  "musiccmd" "--test" "tmp")
+ADD_TEST(basename                  "musiccmd" "--test" "basename")
 #use "make test" to start all tests.
 
 #use this to automatically create installation packages for different platforms

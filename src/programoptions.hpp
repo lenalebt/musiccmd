@@ -76,7 +76,7 @@ public:
     std::string add_categoryParameter;
     
     bool edit_category;
-    std::string edit_categoryParameter;
+    std::vector<std::string> edit_categoryParameter;
     
     bool show_category;
     std::string show_categoryParameter;
