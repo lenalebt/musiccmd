@@ -12,13 +12,58 @@ using namespace music;
 bool search_artist_album_title(music::DatabaseConnection* conn)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
-    if (pOpt->search_title || pOpt->search_artist || pOpt->search_album)
+    if (pOpt->search)
     {
         std::vector<databaseentities::id_datatype> recordingIDs;
         
-        std::string artist = pOpt->search_artist ? pOpt->search_artistParameter : "%";
-        std::string album  = pOpt->search_album  ? pOpt->search_albumParameter : "%";
-        std::string title  = pOpt->search_title  ? pOpt->search_titleParameter : "%";
+        std::string artist; //= pOpt->search_artist ? pOpt->search_artistParameter : "%";
+        std::string album;  //= pOpt->search_album  ? pOpt->search_albumParameter : "%";
+        std::string title;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
+        
+        if (pOpt->searchParameter.size() % 2 != 0)
+        {
+            VERBOSE(0, "parameter count for --search needs to be even, is " <<
+                pOpt->searchParameter.size() << std::endl);
+            return false;
+        }
+        for (unsigned int i=0; i+1<pOpt->searchParameter.size(); i+=2)
+        {   //go steps of 2 and make sure we do not access memory that does not belong to us
+            std::string cmdName = pOpt->searchParameter[i];
+            std::string cmdParam = pOpt->searchParameter[i+1];
+            if (cmdName == "title")
+            {
+                if (title != "")
+                    {VERBOSE(0, "title specified twice, which is not allowed." << std::endl); return false;}
+                else
+                    title = cmdParam;
+            }
+            else if (cmdName == "artist")
+            {
+                if (artist != "")
+                    {VERBOSE(0, "artist specified twice, which is not allowed." << std::endl); return false;}
+                else
+                    artist = cmdParam;
+            }
+            else if (cmdName == "album")
+            {
+                if (album != "")
+                    {VERBOSE(0, "album specified twice, which is not allowed." << std::endl); return false;}
+                else
+                    album = cmdParam;
+            }
+            else
+            {
+                VERBOSE(0, "unknown command \"" << cmdName << "\" with parameter \"" <<
+                    cmdParam << "\"."<< std::endl);
+                return false;
+            }
+        }
+        if (title == "")
+            title = "%";
+        if (artist == "")
+            artist = "%";
+        if (album == "")
+            album = "%";
         
         conn->getRecordingIDsByProperties(recordingIDs, artist, title, album);
         for (std::vector<databaseentities::id_datatype>::const_iterator it = recordingIDs.begin(); it != recordingIDs.end(); it++)

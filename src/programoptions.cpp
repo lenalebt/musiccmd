@@ -40,6 +40,13 @@ int parseProgramOptions(int argc, char* argv[])
     optClassification.add_options()
         ("add-category", po::value<std::string>(&pOpt->add_categoryParameter),
             "Add a category with the given name.")
+        ("edit-category", po::value<std::string>(&pOpt->edit_categoryParameter),
+            "Edits a category with the given name. you need to specify additional parameters:\n"
+            "   add-positive searchparams\n"
+            "   add-negative searchparams\n"
+            "   remove       searchparams\n"
+            "where searchparams are equivalent to the parameters of --search."
+            )
         ("show-category", po::value<std::string>(&pOpt->show_categoryParameter),
             "Show information about a category with the given name. You may use "
             "wildcards \"*\" and \"?\".")
@@ -52,15 +59,13 @@ int parseProgramOptions(int argc, char* argv[])
         ("verbose-dbinfo,i", po::value<unsigned int>(&pOpt->db_verbosity_level)->implicit_value(1)->default_value(0),
             "Set verbosity level for database queries. Higher numbers indicate "
             "more verbose output.")
-        ("search-artist", po::value<std::string>(&pOpt->search_artistParameter),
-            "Search for all recordings from an artist. You may use "
-            "wildcards \"*\" and \"?\".")
-        ("search-album", po::value<std::string>(&pOpt->search_albumParameter),
-            "Search for all recordings from an album. You may use "
-            "wildcards \"*\" and \"?\".")
-        ("search-title",  po::value<std::string>(&pOpt->search_titleParameter),
-            "Search for all recordings with given title. You may use "
-            "wildcards \"*\" and \"?\".")
+        ("search", po::value<std::vector<std::string> >(&pOpt->searchParameter)->multitoken(),
+            "Search for recordings with specified properties."
+            "Properties can be selected via:\n"
+            "   title  t\n"
+            "   artist a\n"
+            "   album  b\n"
+            " You may use wildcards \"*\" and \"?\".")
         ("search-filename",  po::value<std::string>(&pOpt->search_filenameParameter),
             "Search for all file names containing the search string.")
         ;
@@ -107,12 +112,8 @@ int parseProgramOptions(int argc, char* argv[])
     if (vm.count("remove-category"))
         pOpt->remove_category = true;
     
-    if (vm.count("search-artist"))
-        pOpt->search_artist = true;
-    if (vm.count("search-album"))
-        pOpt->search_album = true;
-    if (vm.count("search-title"))
-        pOpt->search_title = true;
+    if (vm.count("search"))
+        pOpt->search = true;
     if (vm.count("search-filename"))
         pOpt->search_filename = true;
     if (vm.count("clean-db"))
@@ -129,10 +130,10 @@ ProgramOptions::ProgramOptions() :
     verbosity_level(0),
     db_verbosity_level(0),
     
-    dbfile(""),
+    dbfile("database.db"),
     
     test(false),
-    testParameter(""),
+    testParameter(),
     
     add_file(false),
     add_fileParameter(),
@@ -140,19 +141,25 @@ ProgramOptions::ProgramOptions() :
     add_folder(false),
     add_folderParameter(),
     
-    search_artist(false),
-    search_artistParameter(""),
-    
-    search_album(false),
-    search_albumParameter(""),
-    
-    search_title(false),
-    search_titleParameter(""),
+    search(false),
+    searchParameter(),
     
     search_filename(false),
-    search_filenameParameter(""),
+    search_filenameParameter(),
     
-    clean_db(false)
+    clean_db(false),
+    
+    add_category(false),
+    add_categoryParameter(),
+    
+    edit_category(false),
+    edit_categoryParameter(),
+    
+    show_category(false),
+    show_categoryParameter(),
+    
+    remove_category(false),
+    remove_categoryParameter()
 {
     
 }
@@ -169,7 +176,6 @@ void ProgramOptions::replaceWildcards(std::string& str)
 }
 void ProgramOptions::replaceAllWildcards()
 {
-    replaceWildcards(search_artistParameter);
-    replaceWildcards(search_albumParameter);
-    replaceWildcards(search_titleParameter);
+    for (unsigned int i=0; i<searchParameter.size(); i++)
+        replaceWildcards(searchParameter[i]);
 }

@@ -63,14 +63,8 @@ public:
     std::vector<std::string> add_folderParameter;
     
     //options for database queries
-    bool search_artist;
-    std::string search_artistParameter;
-    
-    bool search_album;
-    std::string search_albumParameter;
-    
-    bool search_title;
-    std::string search_titleParameter;
+    bool search;
+    std::vector<std::string> searchParameter;
     
     bool search_filename;
     std::string search_filenameParameter;
@@ -80,6 +74,9 @@ public:
     //options for classification
     bool add_category;
     std::string add_categoryParameter;
+    
+    bool edit_category;
+    std::string edit_categoryParameter;
     
     bool show_category;
     std::string show_categoryParameter;

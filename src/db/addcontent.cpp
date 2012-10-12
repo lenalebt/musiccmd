@@ -45,7 +45,7 @@ int addFileToDB(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
     
     //preprocess that file...
     VERBOSE(1, "add \"" << realfilename << "\"" << std::flush);
-    if (proc.preprocessFile(realfilename, recordingID, conn))
+    if (proc.preprocessFile(realfilename, recordingID))
     {
         VERBOSE(2, ", recording ID: " << recordingID);
         VERBOSE(1, std::endl);

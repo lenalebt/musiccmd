@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     DatabaseConnection* conn = new SQLiteDatabaseConnection();
     conn->open(pOpt->dbfile);
     
-    FilePreprocessor proc;
+    FilePreprocessor proc(conn);
     
     //first add files, then add folders
     if (!add_file(conn, proc))
