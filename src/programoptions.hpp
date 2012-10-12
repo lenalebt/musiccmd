@@ -76,5 +76,15 @@ public:
     std::string search_filenameParameter;
     
     bool clean_db;
+    
+    //options for classification
+    bool add_category;
+    std::string add_categoryParameter;
+    
+    bool show_category;
+    std::string show_categoryParameter;
+    
+    bool remove_category;
+    std::string remove_categoryParameter;
 };
 #endif      //PROGRAMOPTIONS_HPP

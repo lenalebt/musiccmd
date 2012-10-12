@@ -145,3 +145,20 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc)
     
     return true;
 }
+
+bool add_category(music::DatabaseConnection* conn)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    if (pOpt->add_category)
+    {
+        VERBOSE(0, "add category to database." << std::endl);
+        
+        music::databaseentities::Category cat;
+        cat.setID(-1);
+        cat.setCategoryName(pOpt->add_categoryParameter);
+        
+        conn->addCategory(cat);
+    }
+    
+    return true;
+}

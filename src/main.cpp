@@ -51,6 +51,22 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
+    if (!add_category(conn))
+    {
+        ERROR_OUT("failed to add category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
+    if (!show_category(conn))
+    {
+        ERROR_OUT("failed to show category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
     if (!search_artist_album_title(conn))
     {
         ERROR_OUT("failed to search for artist. aborting.", 0);

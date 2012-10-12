@@ -8,4 +8,8 @@ bool search_filename(music::DatabaseConnection* conn);
 
 void displayRecordingDetails(const music::databaseentities::Recording& rec);
 
+bool show_category(music::DatabaseConnection* conn);
+
+void displayCategoryDetails(const music::databaseentities::Category& cat);
+
 #endif //DB_QUERYCONTENT_HPP

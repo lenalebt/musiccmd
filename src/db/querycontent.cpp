@@ -79,3 +79,40 @@ void displayRecordingDetails(const databaseentities::Recording& rec)
         VERBOSE_DB(1, "no features found." << std::endl);
     }
 }
+
+bool show_category(music::DatabaseConnection* conn)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    if (pOpt->show_category)
+    {
+        std::vector< databaseentities::id_datatype > categoryIDs;
+        
+        conn->getCategoryIDsByName(categoryIDs, pOpt->show_categoryParameter);
+        
+        for (unsigned int i=0; i<categoryIDs.size(); i++)
+        {
+            music::databaseentities::Category cat;
+            cat.setID(categoryIDs[i]);
+            conn->getCategoryByID(cat, true);
+            VERBOSE_DB(0, "category found: \"" << cat.getCategoryName() << "\"" << std::endl);
+            displayCategoryDetails(cat);
+        }
+    }
+    
+    return true;
+}
+
+void displayCategoryDetails(const music::databaseentities::Category& cat)
+{
+    VERBOSE_DB(0, "\t name:          " << cat.getCategoryName() << std::endl);
+    VERBOSE_DB(1, "\t some features still missing (members, etc.)" << std::endl);
+    if (cat.getCategoryDescription() != NULL)
+    {
+        VERBOSE_DB(3, "\t classifier description: " << cat.getCategoryDescription()->getClassifierDescription() << std::endl);
+        VERBOSE_DB(3, "\t timbre model:           " << cat.getCategoryDescription()->getTimbreModel() << std::endl);
+    }
+    else
+    {
+        VERBOSE_DB(1, "no features found." << std::endl);
+    }
+}

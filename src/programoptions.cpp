@@ -38,9 +38,13 @@ int parseProgramOptions(int argc, char* argv[])
     
     po::options_description optClassification("Options for classification");
     optClassification.add_options()
-        ("add-category", "Add a category with the given name.")                     //TODO: implement
-        ("show-category", "Show information about a category with the given name.") //TODO: implement
-        ("remove-category", "Remove a category with the given name.")               //TODO: implement
+        ("add-category", po::value<std::string>(&pOpt->add_categoryParameter),
+            "Add a category with the given name.")
+        ("show-category", po::value<std::string>(&pOpt->show_categoryParameter),
+            "Show information about a category with the given name. You may use "
+            "wildcards \"*\" and \"?\".")
+        ("remove-category", po::value<std::string>(&pOpt->remove_categoryParameter),
+            "Remove a category with the given name.")
         ;
     
     po::options_description optQueryDB("Options for querying the database");
@@ -95,6 +99,14 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->add_file = true;
     if (vm.count("add-folder"))
         pOpt->add_folder = true;
+    
+    if (vm.count("add-category"))
+        pOpt->add_category = true;
+    if (vm.count("show-category"))
+        pOpt->show_category = true;
+    if (vm.count("remove-category"))
+        pOpt->remove_category = true;
+    
     if (vm.count("search-artist"))
         pOpt->search_artist = true;
     if (vm.count("search-album"))
