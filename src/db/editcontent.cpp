@@ -2,6 +2,7 @@
 
 #include "logging.hpp"
 #include "programoptions.hpp"
+#include "music.hpp"
 
 using namespace music;
 
@@ -19,18 +20,21 @@ bool edit_category(DatabaseConnection* conn)
         std::string album;  //= pOpt->search_album  ? pOpt->search_albumParameter : "%";
         std::string title;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
         
-        unsigned int parsePos=1;
+        std::string categoryName;
+        
+        unsigned int parsePos=2;
         std::string parentCmd;
         std::string newParentCmd;
         
-        if (pOpt->edit_categoryParameter.size() < 3)
+        if (pOpt->edit_categoryParameter.size() < 4)
         {
-            VERBOSE(0, "--edit-category needs at least 3 parameters, " <<
+            VERBOSE(0, "--edit-category needs at least 4 parameters, " <<
                 pOpt->edit_categoryParameter.size() << " given." << std::endl);
             return false;
         }
         
-        newParentCmd = pOpt->edit_categoryParameter[0];
+        categoryName = pOpt->edit_categoryParameter[0];
+        newParentCmd = pOpt->edit_categoryParameter[1];
         
         while (parsePos < pOpt->edit_categoryParameter.size())
         {
@@ -115,7 +119,47 @@ bool edit_category(DatabaseConnection* conn)
             tmpRecordingIDs.clear();
         }
         
-        //TODO: go on with parsed lists
+        databaseentities::Category category;
+        std::vector<databaseentities::id_datatype> categoryIDs;
+        if (!conn->getCategoryIDsByName(categoryIDs, categoryName))
+            return false;
+        if (categoryIDs.size() == 0)
+        {   //not found
+            VERBOSE(0, "category not found: \"" << categoryName << "\", aborting." << std::endl);
+            return false;
+        }
+        else if (categoryIDs.size() != 1)
+        {   //too many
+            VERBOSE(0, "found more than one category for search string \"" << categoryName << "\", aborting." << std::endl);
+            VERBOSE(0, "found categories:" << std::endl);
+            for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+            {
+                conn->getCategoryByID(category, *it);
+                VERBOSE(0, "   " << category.getCategoryName());
+            }
+            return false;
+        }
+        
+        category.setID(categoryIDs[0]);
+        if (!conn->getCategoryByID(category, true))
+            return false;
+        
+        VERBOSE(1, "editing category \"" << category.getCategoryName() << "\"..." << std::endl);
+        
+        conn->beginTransaction();
+        for (std::vector<databaseentities::id_datatype>::const_iterator it = posRecordingIDs.begin(); it != posRecordingIDs.end(); ++it)
+            conn->updateCategoryExampleScore(category.getID(), *it, 1.0);	
+        for (std::vector<databaseentities::id_datatype>::const_iterator it = negRecordingIDs.begin(); it != negRecordingIDs.end(); ++it)
+            conn->updateCategoryExampleScore(category.getID(), *it, -1.0);
+        for (std::vector<databaseentities::id_datatype>::const_iterator it = remRecordingIDs.begin(); it != remRecordingIDs.end(); ++it)
+            conn->updateCategoryExampleScore(category.getID(), *it, 0.0/0.0);
+        conn->endTransaction();
+        
+        
+        #if 0
+        ClassificationProcessor proc(conn);
+        proc.recalculateCategory
+        #endif
         
     }
     
