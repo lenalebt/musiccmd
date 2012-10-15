@@ -35,6 +35,11 @@ bool edit_category(DatabaseConnection* conn)
         
         categoryName = pOpt->edit_categoryParameter[0];
         newParentCmd = pOpt->edit_categoryParameter[1];
+        if (!((newParentCmd == "add-positive") || (newParentCmd == "add-negative") || (newParentCmd == "remove")))
+        {
+            VERBOSE(0, "unknown command \"" << newParentCmd << "\"."<< std::endl);
+            return false;
+        }
         
         while (parsePos < pOpt->edit_categoryParameter.size())
         {
@@ -48,6 +53,7 @@ bool edit_category(DatabaseConnection* conn)
             {   //go steps of 2 and make sure we do not access memory that does not belong to us
                 std::string cmdName = pOpt->edit_categoryParameter[i];
                 std::string cmdParam = pOpt->edit_categoryParameter[i+1];
+                
                 if (cmdName == "title")
                 {
                     if (title != "")
@@ -99,8 +105,13 @@ bool edit_category(DatabaseConnection* conn)
             if (album == "")
                 album = "%";
             
+            DEBUG_VAR_OUT(title, 0);
+            DEBUG_VAR_OUT(artist, 0);
+            DEBUG_VAR_OUT(album, 0);
+            
             std::vector<databaseentities::id_datatype> tmpRecordingIDs;
             conn->getRecordingIDsByProperties(tmpRecordingIDs, artist, title, album);
+            DEBUG_VAR_OUT(tmpRecordingIDs.size(), 0);
             if (parentCmd == "add-positive")
             {
                 for (std::vector<databaseentities::id_datatype>::const_iterator it = tmpRecordingIDs.begin(); it != tmpRecordingIDs.end(); ++it)
@@ -117,6 +128,10 @@ bool edit_category(DatabaseConnection* conn)
                     remRecordingIDs.push_back(*it);
             }
             tmpRecordingIDs.clear();
+            
+            DEBUG_VAR_OUT(posRecordingIDs.size(), 0);
+            DEBUG_VAR_OUT(negRecordingIDs.size(), 0);
+            DEBUG_VAR_OUT(remRecordingIDs.size(), 0);
         }
         
         databaseentities::Category category;
@@ -134,8 +149,9 @@ bool edit_category(DatabaseConnection* conn)
             VERBOSE(0, "found categories:" << std::endl);
             for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
             {
-                conn->getCategoryByID(category, *it);
-                VERBOSE(0, "   " << category.getCategoryName());
+                category.setID(*it);
+                conn->getCategoryByID(category, true);
+                VERBOSE(0, "   " << category.getCategoryName() << std::endl);
             }
             return false;
         }
@@ -152,15 +168,65 @@ bool edit_category(DatabaseConnection* conn)
         for (std::vector<databaseentities::id_datatype>::const_iterator it = negRecordingIDs.begin(); it != negRecordingIDs.end(); ++it)
             conn->updateCategoryExampleScore(category.getID(), *it, -1.0);
         for (std::vector<databaseentities::id_datatype>::const_iterator it = remRecordingIDs.begin(); it != remRecordingIDs.end(); ++it)
-            conn->updateCategoryExampleScore(category.getID(), *it, 0.0/0.0);
+            conn->updateCategoryExampleScore(category.getID(), *it, sqrt(-1.0));
         conn->endTransaction();
         
+        VERBOSE(2, "retrain classifier..." << std::endl);
         
-        #if 0
         ClassificationProcessor proc(conn);
-        proc.recalculateCategory
-        #endif
+        OutputStreamCallback osc;
+        proc.recalculateCategory(category, true, &osc);
         
+        //proc
+        
+    }
+    
+    return true;
+}
+
+bool recalculate_category(music::DatabaseConnection* conn)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    if (pOpt->recalculate_category)
+    {
+        VERBOSE(1, "recalculate category ");
+        
+        databaseentities::Category category;
+        std::vector<databaseentities::id_datatype> categoryIDs;
+        if (!conn->getCategoryIDsByName(categoryIDs, pOpt->recalculate_categoryParameter))
+            return false;
+        if (categoryIDs.size() == 0)
+        {   //not found
+            VERBOSE(0, "category not found: \"" << pOpt->recalculate_categoryParameter << "\", aborting." << std::endl);
+            return false;
+        }
+        else if (categoryIDs.size() != 1)
+        {   //too many
+            VERBOSE(0, "found more than one category for search string \"" << pOpt->recalculate_categoryParameter << "\", aborting." << std::endl);
+            VERBOSE(0, "found categories:" << std::endl);
+            for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+            {
+                category.setID(*it);
+                conn->getCategoryByID(category, true);
+                VERBOSE(0, "   " << category.getCategoryName() << std::endl);
+            }
+            return false;
+        }
+        
+        category.setID(categoryIDs[0]);
+        if (!conn->getCategoryByID(category, true))
+            return false;
+        
+        VERBOSE(1, category.getCategoryName() << "..." << std::endl);
+        
+        ClassificationProcessor proc(conn);
+        OutputStreamCallback osc;
+        proc.recalculateCategory(category, true, &osc);
+        
+        if (category.getCategoryDescription() != NULL)
+        {
+            VERBOSE_DB(3, "    new timbre model: " << category.getCategoryDescription()->getTimbreModel());
+        }
     }
     
     return true;

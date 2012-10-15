@@ -19,6 +19,7 @@ using namespace music;
 int main(int argc, char *argv[])
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
+    srand(time(NULL));
     
 	if (parseProgramOptions(argc, argv) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -61,6 +62,14 @@ int main(int argc, char *argv[])
     }
     
     if (!edit_category(conn))
+    {
+        ERROR_OUT("failed to edit category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
+    if (!recalculate_category(conn))
     {
         ERROR_OUT("failed to edit category. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);

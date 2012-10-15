@@ -62,12 +62,17 @@ public:
     bool add_folder;
     std::vector<std::string> add_folderParameter;
     
+    bool replace_if_found;
+    
     //options for database queries
     bool search;
     std::vector<std::string> searchParameter;
     
     bool search_filename;
     std::string search_filenameParameter;
+    
+    bool show_timbre_scores;
+    std::string show_timbre_scoresParameter;
     
     bool clean_db;
     
@@ -77,6 +82,9 @@ public:
     
     bool edit_category;
     std::vector<std::string> edit_categoryParameter;
+    
+    bool recalculate_category;
+    std::string recalculate_categoryParameter;
     
     bool show_category;
     std::string show_categoryParameter;

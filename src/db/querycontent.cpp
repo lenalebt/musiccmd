@@ -65,7 +65,50 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
         if (album == "")
             album = "%";
         
+        VERBOSE(1, "searching for recording, title=\"" << title << "\", artist=\""
+            << artist << "\", album=\"" << album << "\"" << std::endl);
+        
+        databaseentities::Category cat;
+        GaussianMixtureModel<kiss_fft_scalar>* catTimbreModel = NULL;
+        if (pOpt->show_timbre_scores)
+        {
+            VERBOSE(2, "loading timbre model for category " << pOpt->show_timbre_scoresParameter << "." << std::endl);
+            //cat.setCategoryName(pOpt->show_timbre_scoresParameter);
+            //conn->getCategoryByID(cat, true);
+            
+            std::vector<databaseentities::id_datatype> categoryIDs;
+            conn->getCategoryIDsByName(categoryIDs, pOpt->show_timbre_scoresParameter);
+            
+            if (categoryIDs.size() == 0)
+            {   //not found
+                VERBOSE(0, "category not found: \"" << pOpt->show_timbre_scoresParameter << "\", aborting." << std::endl);
+                return false;
+            }
+            else if (categoryIDs.size() != 1)
+            {   //too many
+                VERBOSE(0, "found more than one category for search string \"" << pOpt->show_timbre_scoresParameter << "\", aborting." << std::endl);
+                VERBOSE(0, "found categories:" << std::endl);
+                for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+                {
+                    conn->getCategoryByID(cat, *it);
+                    VERBOSE(0, "   " << cat.getCategoryName());
+                }
+                return false;
+            }
+            cat.setID(categoryIDs[0]);
+            
+            conn->getCategoryByID(cat, true);
+            if (cat.getCategoryDescription() != NULL)
+                catTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getTimbreModel());
+            else
+            {
+                VERBOSE(0, "chosen category has no category description, which may not happen." << std::endl;)
+                return false;
+            }
+        }
+        
         conn->getRecordingIDsByProperties(recordingIDs, artist, title, album);
+        VERBOSE(1, "found " << recordingIDs.size() << " recordings:" << std::endl);
         for (std::vector<databaseentities::id_datatype>::const_iterator it = recordingIDs.begin(); it != recordingIDs.end(); it++)
         {
             databaseentities::Recording rec;
@@ -75,7 +118,34 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
             VERBOSE(0, "title found: \"" << rec.getTitle() << "\"." << std::endl);
             
             displayRecordingDetails(rec);
+            if (pOpt->show_timbre_scores)
+            {
+                VERBOSE(0, "\t timbre score: \t");
+                if (rec.getRecordingFeatures() != NULL)
+                {
+                    GaussianMixtureModel<kiss_fft_scalar>* songModel = NULL;
+                    songModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
+                    
+                    double scoreA = songModel->compareTo(*catTimbreModel);
+                    double scoreB = catTimbreModel->compareTo(*songModel);
+                    
+                    VERBOSE(0, scoreA);
+                    VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
+                        << scoreB << " for model-to-song)");
+                    VERBOSE(0, std::endl);
+                    
+                    if (songModel)
+                        delete songModel;
+                }
+                else
+                {
+                    VERBOSE(0, "no recording features found, so no score calculated." << std::endl);
+                }
+            }
         }
+        
+        if (catTimbreModel)
+            delete catTimbreModel;
     }
     
     return true;

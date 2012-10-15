@@ -24,6 +24,8 @@ using namespace music;
  */
 int addFileToDB(music::DatabaseConnection* conn, music::FilePreprocessor& proc, const std::string& filename)
 {
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    
     databaseentities::id_datatype recordingID;
     //check if the file already is in the database...
     char* realfilename_c = NULL;
@@ -34,8 +36,18 @@ int addFileToDB(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
     {
         if (recordingID != -1)
         {
-            VERBOSE(1, "file \"" << realfilename << "\" already in database, skipping." << std::endl);
-            return -1;
+            if (pOpt->replace_if_found)
+            {
+                VERBOSE(1, "file \"" << realfilename << "\" already in database, replacing." << std::endl);
+                if (!conn->deleteRecordingByID(recordingID))
+                    return 0;
+                recordingID = -1;
+            }
+            else
+            {
+                VERBOSE(1, "file \"" << realfilename << "\" already in database, skipping." << std::endl);
+                return -1;
+            }
         }
     }
     else
@@ -151,7 +163,9 @@ bool add_category(music::DatabaseConnection* conn)
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->add_category)
     {
-        VERBOSE(0, "add category to database." << std::endl);
+        VERBOSE(1, "add category to database");
+        VERBOSE(2, ": " << pOpt->add_categoryParameter);
+        VERBOSE(1, "." << std::endl);
         
         music::databaseentities::Category cat;
         cat.setID(-1);

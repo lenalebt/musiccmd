@@ -33,6 +33,8 @@ int parseProgramOptions(int argc, char* argv[])
         ("add-folder,A", po::value<std::vector<std::string> >(&pOpt->add_folderParameter)->composing()->multitoken(),
             "Add all files from a folder to the database.  You may specify "
             "more than one folder.")
+        ("replace-if-found,x", "Replace files that are found in the database "
+            "while adding new files, instead of skipping them.")
         ("clean-db", "Look for files that are no longer available and delete them from the database.")
         ;
     
@@ -41,17 +43,22 @@ int parseProgramOptions(int argc, char* argv[])
         ("add-category", po::value<std::string>(&pOpt->add_categoryParameter),
             "Add a category with the given name.")
         ("edit-category", po::value<std::vector<std::string> >(&pOpt->edit_categoryParameter)->multitoken(),
-            "Edits a category with the given name. you need to specify additional parameters:\n"
+            "Edits a category with the given name. You need to specify additional parameters:\n"
             "   add-positive searchparams\n"
             "   add-negative searchparams\n"
             "   remove       searchparams\n"
-            "where searchparams are equivalent to the parameters of --search."
+            "where searchparams are equivalent to the parameters of --search.\n"
+            "Example:\n"
+            "    \t./musiccmd --edit-category powermetal add-positive artist '*sonata*arctica*'"
             )
+        ("recalculate-category", po::value<std::string>(&pOpt->recalculate_categoryParameter),
+            "Recalculates the category models. May help if something got wrong"
+            " with the category.")
         ("show-category", po::value<std::string>(&pOpt->show_categoryParameter),
             "Show information about a category with the given name. You may use "
             "wildcards \"*\" and \"?\".")
         ("remove-category", po::value<std::string>(&pOpt->remove_categoryParameter),
-            "Remove a category with the given name.")
+            "Remove a category with the given name.")   //TODO (delete everything, category-memberships and examples, too!)
         ;
     
     po::options_description optQueryDB("Options for querying the database");
@@ -72,6 +79,10 @@ int parseProgramOptions(int argc, char* argv[])
             "would find the song \"Starring\" by \"Freelance Whales\".")
         ("search-filename",  po::value<std::string>(&pOpt->search_filenameParameter),
             "Search for all file names containing the search string.")
+        ("show-timbre-scores", po::value<std::string>(&pOpt->show_timbre_scoresParameter),
+            "Show scores of "
+            "timbre similarity for category with the given name when "
+            "searching recordings.")
         ;
     
     po::variables_map vm;
@@ -108,11 +119,15 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->add_file = true;
     if (vm.count("add-folder"))
         pOpt->add_folder = true;
+    if (vm.count("replace-if-found"))
+        pOpt->replace_if_found = true;
     
     if (vm.count("add-category"))
         pOpt->add_category = true;
     if (vm.count("edit-category"))
         pOpt->edit_category = true;
+    if (vm.count("recalculate-category"))
+        pOpt->recalculate_category = true;
     if (vm.count("show-category"))
         pOpt->show_category = true;
     if (vm.count("remove-category"))
@@ -122,6 +137,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->search = true;
     if (vm.count("search-filename"))
         pOpt->search_filename = true;
+    if (vm.count("show-timbre-scores"))
+        pOpt->show_timbre_scores = true;
     if (vm.count("clean-db"))
         pOpt->clean_db = true;
     
@@ -147,11 +164,16 @@ ProgramOptions::ProgramOptions() :
     add_folder(false),
     add_folderParameter(),
     
+    replace_if_found(false),
+    
     search(false),
     searchParameter(),
     
     search_filename(false),
     search_filenameParameter(),
+    
+    show_timbre_scores(false),
+    show_timbre_scoresParameter(),
     
     clean_db(false),
     
@@ -160,6 +182,9 @@ ProgramOptions::ProgramOptions() :
     
     edit_category(false),
     edit_categoryParameter(),
+    
+    recalculate_category(false),
+    recalculate_categoryParameter(),
     
     show_category(false),
     show_categoryParameter(),
@@ -184,4 +209,6 @@ void ProgramOptions::replaceAllWildcards()
 {
     for (unsigned int i=0; i<searchParameter.size(); i++)
         replaceWildcards(searchParameter[i]);
+    for (unsigned int i=0; i<edit_categoryParameter.size(); i++)
+        replaceWildcards(edit_categoryParameter[i]);
 }

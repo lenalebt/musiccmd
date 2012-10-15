@@ -4,5 +4,6 @@
 #include "music.hpp"
 
 bool edit_category(music::DatabaseConnection* conn);
+bool recalculate_category(music::DatabaseConnection* conn);
 
 #endif  //DB_EDITCONTENT_HPP
