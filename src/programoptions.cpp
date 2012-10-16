@@ -11,11 +11,26 @@ int parseProgramOptions(int argc, char* argv[])
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     
-    po::options_description optAll("All options");
+    po::options_description optAll("All available options");
+    po::options_description optHelp("Parameters");
     
     po::options_description optGlobal("Global options");
     optGlobal.add_options()
-        ("help,h", "Show help message and exit.")
+        ("help,h", po::value<std::string>()->implicit_value("global"),
+            "Show help message and exit. Detailed help is available on "
+            "topics:\n"
+            "  database:\n"
+            "     \tShow options for database access\n"
+            "  features:\n"
+            "     \tShow options for feature extraction fine-tuning\n"
+            "  category:\n"
+            "     \tShow options for category creation fine-tuning\n"
+            "  global:\n"
+            "     \tShow only global options\n"
+            "  standard:\n"
+            "     \tShow the most commonly used options\n"
+            "  all:\n"
+            "     \tShow all available options\n")
         ("dbfile", po::value<std::string>(&pOpt->dbfile)->default_value("database.db"),
             "Set database file (where to store results etc.).")
         ("version", "Show version number and exit.")
@@ -85,8 +100,35 @@ int parseProgramOptions(int argc, char* argv[])
             "searching recordings.")
         ;
     
+    po::options_description optFineTuneFeatures("Options for feature extraction fine-tuning");
+    optFineTuneFeatures.add_options()
+        ("timbre-timeslice-size", po::value<double>(&pOpt->timbre_timeslice_size)->default_value(0.01),
+            "Set the size of the time slices for timbre vector extraction, in seconds. "
+            "Typical values are in the range of 0.005 to 0.03.")
+        ("timbre-dimension", po::value<unsigned int>(&pOpt->timbre_dimension)->default_value(20),
+            "Set the dimension of the timbre vectors. Typical values are "
+            "in the range of 4 to 40.")
+        ("timbre-modelsize", po::value<unsigned int>(&pOpt->timbre_modelsize)->default_value(20),
+            "Set the model size of the timbre vectors, i.e. the number "
+            "of normal distributions used to model the timbre vectors. "
+            "Typical values are in the range of 5 to 50.")
+        ;
+    
+    po::options_description optFineTuneCategoryCreation("Options for category creation fine-tuning");
+    optFineTuneCategoryCreation.add_options()
+        ("category-timbre-modelsize", po::value<unsigned int>(&pOpt->category_timbre_modelsize)->default_value(60),
+            "Set the model size of the timbre model for a group of songs."
+            "Typical values are in the range of 20 to 100.")
+        ("category-persong-samplesize", po::value<unsigned int>(&pOpt->category_persong_samplesize)->default_value(20000),
+            "Set the number of samples drawn from the model for one song to "
+            "build the model for a group of songs. "
+            "Typical values are in the range of 1000 to 30000.")
+        ;
+    
     po::variables_map vm;
-    optAll.add(optGlobal).add(optDatabase).add(optQueryDB).add(optClassification);
+    optAll.add(optGlobal).add(optDatabase).add(optQueryDB).add(optClassification)
+        .add(optFineTuneFeatures).add(optFineTuneCategoryCreation);
+    optHelp.add(optGlobal).add(optDatabase).add(optQueryDB).add(optClassification);
     
     try{po::store(po::parse_command_line(argc, argv, optAll), vm);}
     catch(po::error& e)
@@ -105,9 +147,38 @@ int parseProgramOptions(int argc, char* argv[])
     }
     //produce help message
     if (vm.count("help")) {
-        std::cerr << "musiccmd is a commandline frontend for libmusic. " <<
-            "You may call it with the following options:" << std::endl;
-        std::cerr << optAll << std::endl;
+        if (vm["help"].as<std::string>() == "standard")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optHelp << std::endl;
+        }
+        else if (vm["help"].as<std::string>() == "global")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optGlobal << std::endl;
+        }
+        else if (vm["help"].as<std::string>() == "all")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optAll << std::endl;
+        }
+        else if (vm["help"].as<std::string>() == "features")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optFineTuneFeatures << std::endl;
+        }
+        else if (vm["help"].as<std::string>() == "category")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optFineTuneCategoryCreation << std::endl;
+        }
+        else if (vm["help"].as<std::string>() == "database")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            po::options_description optAllDatabase("Database options");
+            optAllDatabase.add(optDatabase).add(optQueryDB);
+            std::cerr << optAllDatabase << std::endl;
+        }
         return EXIT_FAILURE;
     }
     
@@ -190,7 +261,14 @@ ProgramOptions::ProgramOptions() :
     show_categoryParameter(),
     
     remove_category(false),
-    remove_categoryParameter()
+    remove_categoryParameter(),
+    
+    timbre_timeslice_size(0.01),
+    timbre_dimension(20),
+    timbre_modelsize(20),
+    
+    category_timbre_modelsize(60),
+    category_persong_samplesize(20000)
 {
     
 }

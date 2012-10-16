@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     DatabaseConnection* conn = new SQLiteDatabaseConnection();
     conn->open(pOpt->dbfile);
     
-    FilePreprocessor proc(conn);
+    FilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size);
     
     //first add files, then add folders
     if (!add_file(conn, proc))

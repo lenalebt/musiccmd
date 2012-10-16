@@ -91,5 +91,13 @@ public:
     
     bool remove_category;
     std::string remove_categoryParameter;
+    
+    //options for feature extraction fine-tuning
+    double       timbre_timeslice_size;
+    unsigned int timbre_dimension;
+    unsigned int timbre_modelsize;
+    
+    unsigned int category_timbre_modelsize;
+    unsigned int category_persong_samplesize;
 };
 #endif      //PROGRAMOPTIONS_HPP

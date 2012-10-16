@@ -173,7 +173,7 @@ bool edit_category(DatabaseConnection* conn)
         
         VERBOSE(2, "retrain classifier..." << std::endl);
         
-        ClassificationProcessor proc(conn);
+        ClassificationProcessor proc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
         OutputStreamCallback osc;
         proc.recalculateCategory(category, true, &osc);
         
@@ -219,7 +219,7 @@ bool recalculate_category(music::DatabaseConnection* conn)
         
         VERBOSE(1, category.getCategoryName() << "..." << std::endl);
         
-        ClassificationProcessor proc(conn);
+        ClassificationProcessor proc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
         OutputStreamCallback osc;
         proc.recalculateCategory(category, true, &osc);
         
