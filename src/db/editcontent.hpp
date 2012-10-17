@@ -3,7 +3,7 @@
 
 #include "music.hpp"
 
-bool edit_category(music::DatabaseConnection* conn);
-bool recalculate_category(music::DatabaseConnection* conn);
+bool edit_category(music::DatabaseConnection* conn, music::ClassificationProcessor& cProc);
+bool recalculate_category(music::DatabaseConnection* conn, music::ClassificationProcessor& cProc);
 
 #endif  //DB_EDITCONTENT_HPP

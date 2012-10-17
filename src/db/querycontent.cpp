@@ -9,7 +9,7 @@
 
 using namespace music;
 
-bool search_artist_album_title(music::DatabaseConnection* conn)
+bool search_artist_album_title_filename(music::DatabaseConnection* conn)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->search)
@@ -19,6 +19,7 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
         std::string artist; //= pOpt->search_artist ? pOpt->search_artistParameter : "%";
         std::string album;  //= pOpt->search_album  ? pOpt->search_albumParameter : "%";
         std::string title;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
+        std::string filename;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
         
         if (pOpt->searchParameter.size() % 2 != 0)
         {
@@ -51,6 +52,13 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
                 else
                     album = cmdParam;
             }
+            else if (cmdName == "filename")
+            {
+                if (filename != "")
+                    {VERBOSE(0, "filename specified twice, which is not allowed." << std::endl); return false;}
+                else
+                    filename = cmdParam;
+            }
             else
             {
                 VERBOSE(0, "unknown command \"" << cmdName << "\" with parameter \"" <<
@@ -64,9 +72,11 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
             artist = "%";
         if (album == "")
             album = "%";
+        if (filename == "")
+            filename = "%";
         
         VERBOSE(1, "searching for recording, title=\"" << title << "\", artist=\""
-            << artist << "\", album=\"" << album << "\"" << std::endl);
+            << artist << "\", album=\"" << album << "\", filename=\"" << filename << "\"" << std::endl);
         
         databaseentities::Category cat;
         GaussianMixtureModel<kiss_fft_scalar>* catTimbreModel = NULL;
@@ -107,7 +117,7 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
             }
         }
         
-        conn->getRecordingIDsByProperties(recordingIDs, artist, title, album);
+        conn->getRecordingIDsByProperties(recordingIDs, artist, title, album, filename);
         VERBOSE(1, "found " << recordingIDs.size() << " recordings:" << std::endl);
         for (std::vector<databaseentities::id_datatype>::const_iterator it = recordingIDs.begin(); it != recordingIDs.end(); it++)
         {
@@ -150,30 +160,6 @@ bool search_artist_album_title(music::DatabaseConnection* conn)
     
     return true;
 }
-bool search_filename(music::DatabaseConnection* conn)
-{
-    ProgramOptions* pOpt = ProgramOptions::getInstance();
-    if (pOpt->search_filename)
-    {
-        databaseentities::id_datatype recordingID;
-        if (conn->getRecordingIDByFilename(recordingID, pOpt->search_filenameParameter) && (recordingID != -1))
-        {
-            databaseentities::Recording rec;
-            rec.setID(recordingID);
-            conn->getRecordingByID(rec, true);
-            
-            VERBOSE(0, "file found: \"" << rec.getFilename() << "\"." << std::endl);
-            
-            displayRecordingDetails(rec);
-        }
-        else
-        {
-            VERBOSE(0, "file not found: \"" << pOpt->search_filenameParameter << "\"." << std::endl);
-        }
-    }
-    
-    return true;
-}
 
 void displayRecordingDetails(const databaseentities::Recording& rec)
 {
@@ -200,7 +186,7 @@ bool show_category(music::DatabaseConnection* conn)
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->show_category)
     {
-        std::vector< databaseentities::id_datatype > categoryIDs;
+        std::vector<databaseentities::id_datatype> categoryIDs;
         
         conn->getCategoryIDsByName(categoryIDs, pOpt->show_categoryParameter);
         
@@ -211,6 +197,22 @@ bool show_category(music::DatabaseConnection* conn)
             conn->getCategoryByID(cat, true);
             VERBOSE_DB(0, "category found: \"" << cat.getCategoryName() << "\"" << std::endl);
             displayCategoryDetails(cat);
+            if (pOpt->db_verbosity_level >= 2)
+            {
+                VERBOSE_DB(2, "50 best matches for this category:" << std::endl);
+                std::vector<std::pair<databaseentities::id_datatype, double> > recordingIDsAndScores;
+                conn->getRecordingIDsInCategory(recordingIDsAndScores, cat.getID(), 0.0, 1000.0, 5000);
+                for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
+                {
+                    databaseentities::Recording rec;
+                    rec.setID(it->first);
+                    conn->getRecordingByID(rec, false); //do not need features
+                    VERBOSE_DB(2, "    " << std::left << std::setw(30) << rec.getArtist()
+                        << " (" << std::left << std::setw(30) << rec.getAlbum() << ")"
+                        << " - " << std::left << std::setw(30) << rec.getTitle() << ", score "
+                        << it->second << std::endl);
+                }
+            }
         }
     }
     

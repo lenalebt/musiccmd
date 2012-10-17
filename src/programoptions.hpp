@@ -68,9 +68,6 @@ public:
     bool search;
     std::vector<std::string> searchParameter;
     
-    bool search_filename;
-    std::string search_filenameParameter;
-    
     bool show_timbre_scores;
     std::string show_timbre_scoresParameter;
     

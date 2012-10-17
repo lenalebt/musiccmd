@@ -35,9 +35,10 @@ int main(int argc, char *argv[])
     conn->open(pOpt->dbfile);
     
     FilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size);
+    ClassificationProcessor cProc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
     
     //first add files, then add folders
-    if (!add_file(conn, proc))
+    if (!add_file(conn, proc, cProc))
     {
         ERROR_OUT("failed to add files. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    if (!add_folder(conn, proc))
+    if (!add_folder(conn, proc, cProc))
     {
         ERROR_OUT("failed to add folders. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    if (!edit_category(conn))
+    if (!edit_category(conn, cProc))
     {
         ERROR_OUT("failed to edit category. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    if (!recalculate_category(conn))
+    if (!recalculate_category(conn, cProc))
     {
         ERROR_OUT("failed to edit category. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
@@ -85,17 +86,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    if (!search_artist_album_title(conn))
+    if (!search_artist_album_title_filename(conn))
     {
-        ERROR_OUT("failed to search for artist. aborting.", 0);
-        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
-        conn->close();
-        return EXIT_FAILURE;
-    }
-    
-    if (!search_filename(conn))
-    {
-        ERROR_OUT("failed to search for filename. aborting.", 0);
+        ERROR_OUT("failed to search. aborting.", 0);
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
         conn->close();
         return EXIT_FAILURE;

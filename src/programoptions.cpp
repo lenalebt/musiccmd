@@ -21,6 +21,8 @@ int parseProgramOptions(int argc, char* argv[])
             "topics:\n"
             "  database:\n"
             "     \tShow options for database access\n"
+            "  classification:\n"
+            "     \tShow options for classification\n"
             "  features:\n"
             "     \tShow options for feature extraction fine-tuning\n"
             "  category:\n"
@@ -84,16 +86,15 @@ int parseProgramOptions(int argc, char* argv[])
         ("search", po::value<std::vector<std::string> >(&pOpt->searchParameter)->multitoken(),
             "Search for recordings with specified properties."
             "Properties can be selected via:\n"
-            "   title  t\n"
-            "   artist a\n"
-            "   album  b\n"
+            "   title    t\n"
+            "   artist   a\n"
+            "   album    b\n"
+            "   filename f\n"
             "You may use wildcards \"*\" and \"?\"."
             "The order of the elements is not relevant.\n"
             "Example:\n"
             "  \t./musiccmd --search artist \'*freelance*\' title starring\n"
             "would find the song \"Starring\" by \"Freelance Whales\".")
-        ("search-filename",  po::value<std::string>(&pOpt->search_filenameParameter),
-            "Search for all file names containing the search string.")
         ("show-timbre-scores", po::value<std::string>(&pOpt->show_timbre_scoresParameter),
             "Show scores of "
             "timbre similarity for category with the given name when "
@@ -179,6 +180,11 @@ int parseProgramOptions(int argc, char* argv[])
             optAllDatabase.add(optDatabase).add(optQueryDB);
             std::cerr << optAllDatabase << std::endl;
         }
+        else if (vm["help"].as<std::string>() == "classification")
+        {
+            std::cerr << "musiccmd is a commandline frontend for libmusic." << std::endl;
+            std::cerr << optClassification << std::endl;
+        }
         return EXIT_FAILURE;
     }
     
@@ -206,8 +212,6 @@ int parseProgramOptions(int argc, char* argv[])
     
     if (vm.count("search"))
         pOpt->search = true;
-    if (vm.count("search-filename"))
-        pOpt->search_filename = true;
     if (vm.count("show-timbre-scores"))
         pOpt->show_timbre_scores = true;
     if (vm.count("clean-db"))
@@ -239,9 +243,6 @@ ProgramOptions::ProgramOptions() :
     
     search(false),
     searchParameter(),
-    
-    search_filename(false),
-    search_filenameParameter(),
     
     show_timbre_scores(false),
     show_timbre_scoresParameter(),

@@ -6,7 +6,7 @@
 
 using namespace music;
 
-bool edit_category(DatabaseConnection* conn)
+bool edit_category(DatabaseConnection* conn, music::ClassificationProcessor& cProc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->edit_category)
@@ -19,6 +19,7 @@ bool edit_category(DatabaseConnection* conn)
         std::string artist; //= pOpt->search_artist ? pOpt->search_artistParameter : "%";
         std::string album;  //= pOpt->search_album  ? pOpt->search_albumParameter : "%";
         std::string title;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
+        std::string filename;  //= pOpt->search_title  ? pOpt->search_titleParameter : "%";
         
         std::string categoryName;
         
@@ -46,6 +47,7 @@ bool edit_category(DatabaseConnection* conn)
             title = "";
             album = "";
             artist = "";
+            filename = "";
             parentCmd = newParentCmd;
             
             unsigned int i;
@@ -74,6 +76,13 @@ bool edit_category(DatabaseConnection* conn)
                         {VERBOSE(0, "album specified twice, which is not allowed." << std::endl); return false;}
                     else
                         album = cmdParam;
+                }
+                else if (cmdName == "filename")
+                {
+                    if (filename != "")
+                        {VERBOSE(0, "filename specified twice, which is not allowed." << std::endl); return false;}
+                    else
+                        filename = cmdParam;
                 }
                 else if ((cmdName == "add-positive") || (cmdName == "add-negative") || (cmdName == "remove"))
                 {
@@ -104,14 +113,11 @@ bool edit_category(DatabaseConnection* conn)
                 artist = "%";
             if (album == "")
                 album = "%";
-            
-            DEBUG_VAR_OUT(title, 0);
-            DEBUG_VAR_OUT(artist, 0);
-            DEBUG_VAR_OUT(album, 0);
+            if (filename == "")
+                filename = "%";
             
             std::vector<databaseentities::id_datatype> tmpRecordingIDs;
-            conn->getRecordingIDsByProperties(tmpRecordingIDs, artist, title, album);
-            DEBUG_VAR_OUT(tmpRecordingIDs.size(), 0);
+            conn->getRecordingIDsByProperties(tmpRecordingIDs, artist, title, album, filename);
             if (parentCmd == "add-positive")
             {
                 for (std::vector<databaseentities::id_datatype>::const_iterator it = tmpRecordingIDs.begin(); it != tmpRecordingIDs.end(); ++it)
@@ -128,10 +134,6 @@ bool edit_category(DatabaseConnection* conn)
                     remRecordingIDs.push_back(*it);
             }
             tmpRecordingIDs.clear();
-            
-            DEBUG_VAR_OUT(posRecordingIDs.size(), 0);
-            DEBUG_VAR_OUT(negRecordingIDs.size(), 0);
-            DEBUG_VAR_OUT(remRecordingIDs.size(), 0);
         }
         
         databaseentities::Category category;
@@ -173,9 +175,8 @@ bool edit_category(DatabaseConnection* conn)
         
         VERBOSE(2, "retrain classifier..." << std::endl);
         
-        ClassificationProcessor proc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
         OutputStreamCallback osc;
-        proc.recalculateCategory(category, true, &osc);
+        cProc.recalculateCategory(category, true, &osc);
         
         //proc
         
@@ -184,7 +185,7 @@ bool edit_category(DatabaseConnection* conn)
     return true;
 }
 
-bool recalculate_category(music::DatabaseConnection* conn)
+bool recalculate_category(music::DatabaseConnection* conn, music::ClassificationProcessor& cProc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->recalculate_category)
@@ -219,9 +220,8 @@ bool recalculate_category(music::DatabaseConnection* conn)
         
         VERBOSE(1, category.getCategoryName() << "..." << std::endl);
         
-        ClassificationProcessor proc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
         OutputStreamCallback osc;
-        proc.recalculateCategory(category, true, &osc);
+        cProc.recalculateCategory(category, true, &osc);
         
         if (category.getCategoryDescription() != NULL)
         {
