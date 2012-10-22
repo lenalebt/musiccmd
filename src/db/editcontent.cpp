@@ -139,7 +139,10 @@ bool edit_category(DatabaseConnection* conn, music::ClassificationProcessor& cPr
         databaseentities::Category category;
         std::vector<databaseentities::id_datatype> categoryIDs;
         if (!conn->getCategoryIDsByName(categoryIDs, categoryName))
+        {
+            VERBOSE(0, "reading DB failed.");
             return false;
+        }
         if (categoryIDs.size() == 0)
         {   //not found
             VERBOSE(0, "category not found: \"" << categoryName << "\", aborting." << std::endl);

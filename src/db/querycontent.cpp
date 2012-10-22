@@ -80,11 +80,10 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
         
         databaseentities::Category cat;
         GaussianMixtureModel<kiss_fft_scalar>* catTimbreModel = NULL;
+        GaussianMixtureModel<kiss_fft_scalar>* catChromaModel = NULL;
         if (pOpt->show_timbre_scores)
         {
             VERBOSE(2, "loading timbre model for category " << pOpt->show_timbre_scoresParameter << "." << std::endl);
-            //cat.setCategoryName(pOpt->show_timbre_scoresParameter);
-            //conn->getCategoryByID(cat, true);
             
             std::vector<databaseentities::id_datatype> categoryIDs;
             conn->getCategoryIDsByName(categoryIDs, pOpt->show_timbre_scoresParameter);
@@ -116,6 +115,40 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
                 return false;
             }
         }
+        if (pOpt->show_chroma_scores)
+        {
+            VERBOSE(2, "loading chroma model for category " << pOpt->show_chroma_scoresParameter << "." << std::endl);
+            
+            std::vector<databaseentities::id_datatype> categoryIDs;
+            conn->getCategoryIDsByName(categoryIDs, pOpt->show_chroma_scoresParameter);
+            
+            if (categoryIDs.size() == 0)
+            {   //not found
+                VERBOSE(0, "category not found: \"" << pOpt->show_chroma_scoresParameter << "\", aborting." << std::endl);
+                return false;
+            }
+            else if (categoryIDs.size() != 1)
+            {   //too many
+                VERBOSE(0, "found more than one category for search string \"" << pOpt->show_chroma_scoresParameter << "\", aborting." << std::endl);
+                VERBOSE(0, "found categories:" << std::endl);
+                for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+                {
+                    conn->getCategoryByID(cat, *it);
+                    VERBOSE(0, "   " << cat.getCategoryName());
+                }
+                return false;
+            }
+            cat.setID(categoryIDs[0]);
+            
+            conn->getCategoryByID(cat, true);
+            if (cat.getCategoryDescription() != NULL)
+                catChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getChromaModel());
+            else
+            {
+                VERBOSE(0, "chosen category has no category description, which may not happen." << std::endl;)
+                return false;
+            }
+        }
         
         conn->getRecordingIDsByProperties(recordingIDs, artist, title, album, filename);
         VERBOSE(1, "found " << recordingIDs.size() << " recordings:" << std::endl);
@@ -133,19 +166,43 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
                 VERBOSE(0, "\t timbre score: \t");
                 if (rec.getRecordingFeatures() != NULL)
                 {
-                    GaussianMixtureModel<kiss_fft_scalar>* songModel = NULL;
-                    songModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
+                    GaussianMixtureModel<kiss_fft_scalar>* songTimbreModel = NULL;
+                    songTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
                     
-                    double scoreA = songModel->compareTo(*catTimbreModel);
-                    double scoreB = catTimbreModel->compareTo(*songModel);
+                    double scoreA = songTimbreModel->compareTo(*catTimbreModel);
+                    double scoreB = catTimbreModel->compareTo(*songTimbreModel);
                     
                     VERBOSE(0, scoreA);
                     VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
                         << scoreB << " for model-to-song)");
                     VERBOSE(0, std::endl);
                     
-                    if (songModel)
-                        delete songModel;
+                    if (songTimbreModel)
+                        delete songTimbreModel;
+                }
+                else
+                {
+                    VERBOSE(0, "no recording features found, so no score calculated." << std::endl);
+                }
+            }
+            if (pOpt->show_chroma_scores)
+            {
+                VERBOSE(0, "\t chroma score: \t");
+                if (rec.getRecordingFeatures() != NULL)
+                {
+                    GaussianMixtureModel<kiss_fft_scalar>* songChromaModel = NULL;
+                    songChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
+                    
+                    double scoreA = songChromaModel->compareTo(*catChromaModel);
+                    double scoreB = catChromaModel->compareTo(*songChromaModel);
+                    
+                    VERBOSE(0, scoreA);
+                    VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
+                        << scoreB << " for model-to-song)");
+                    VERBOSE(0, std::endl);
+                    
+                    if (songChromaModel)
+                        delete songChromaModel;
                 }
                 else
                 {
@@ -156,6 +213,8 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
         
         if (catTimbreModel)
             delete catTimbreModel;
+        if (catChromaModel)
+            delete catChromaModel;
     }
     
     return true;

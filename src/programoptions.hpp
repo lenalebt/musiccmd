@@ -71,6 +71,9 @@ public:
     bool show_timbre_scores;
     std::string show_timbre_scoresParameter;
     
+    bool show_chroma_scores;
+    std::string show_chroma_scoresParameter;
+    
     bool clean_db;
     
     //options for classification
@@ -94,7 +97,12 @@ public:
     unsigned int timbre_dimension;
     unsigned int timbre_modelsize;
     
+    double       chroma_timeslice_size;
+    unsigned int chroma_modelsize;
+    
     unsigned int category_timbre_modelsize;
-    unsigned int category_persong_samplesize;
+    unsigned int category_timbre_persong_samplesize;
+    unsigned int category_chroma_modelsize;
+    unsigned int category_chroma_persong_samplesize;
 };
 #endif      //PROGRAMOPTIONS_HPP

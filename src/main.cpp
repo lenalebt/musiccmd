@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     DatabaseConnection* conn = new SQLiteDatabaseConnection();
     conn->open(pOpt->dbfile);
     
-    FilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size);
-    ClassificationProcessor cProc(conn, pOpt->category_timbre_modelsize, pOpt->category_persong_samplesize);
+    FilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size, pOpt->chroma_modelsize, pOpt->chroma_timeslice_size);
+    ClassificationProcessor cProc(conn, pOpt->category_timbre_modelsize, pOpt->category_timbre_persong_samplesize, pOpt->category_chroma_modelsize, pOpt->category_chroma_persong_samplesize);
     
     //first add files, then add folders
     if (!add_file(conn, proc, cProc))
@@ -100,6 +100,11 @@ int main(int argc, char *argv[])
         VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
         conn->close();
         return EXIT_FAILURE;
+    }
+    
+    if (pOpt->remove_category)
+    {
+        ERROR_OUT("removing categories not yet implemented.", 0);
     }
     
     VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
