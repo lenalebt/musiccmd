@@ -191,7 +191,7 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
                 if (rec.getRecordingFeatures() != NULL)
                 {
                     GaussianMixtureModel<kiss_fft_scalar>* songChromaModel = NULL;
-                    songChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
+                    songChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getChromaModel());
                     
                     double scoreA = songChromaModel->compareTo(*catChromaModel);
                     double scoreB = catChromaModel->compareTo(*songChromaModel);
@@ -233,6 +233,7 @@ void displayRecordingDetails(const databaseentities::Recording& rec)
         VERBOSE_DB(2, "\t tempo:         " << rec.getRecordingFeatures()->getTempo() << std::endl);
         VERBOSE_DB(2, "\t dynamic range: " << rec.getRecordingFeatures()->getDynamicRange() << std::endl);
         VERBOSE_DB(3, "\t timbre model:  " << rec.getRecordingFeatures()->getTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t chroma model:  " << rec.getRecordingFeatures()->getChromaModel() << std::endl);
     }
     else
     {
@@ -286,6 +287,7 @@ void displayCategoryDetails(const music::databaseentities::Category& cat)
     {
         VERBOSE_DB(3, "\t classifier description: " << cat.getCategoryDescription()->getClassifierDescription() << std::endl);
         VERBOSE_DB(3, "\t timbre model:           " << cat.getCategoryDescription()->getTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t chroma model:           " << cat.getCategoryDescription()->getChromaModel() << std::endl);
     }
     else
     {
