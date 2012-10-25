@@ -86,9 +86,10 @@ bool add_file(music::DatabaseConnection* conn, music::FilePreprocessor& proc, mu
     {
         VERBOSE(0, "add files to database." << std::endl);
         std::vector<std::string>* files = &pOpt->add_fileParameter;
-        for (std::vector<std::string>::const_iterator it = files->begin(); it != files->end(); it++)
+        for (unsigned int i=0; i < files->size(); i++)
         {
-            if (addFileToDB(conn, proc, cProc, *it) == 0)
+            VERBOSE(0, std::fixed << std::setprecision(2) << 100.0*double(i)/double(files->size()) << "%, ");
+            if (addFileToDB(conn, proc, cProc, (*files)[i]) == 0)
             {
                 ERROR_OUT("adding file failed.", 10);
             }
@@ -105,6 +106,7 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
         VERBOSE(0, "add files from folders to database." << std::endl);
         DIR* dir = NULL;        //POSIX standard calls
         struct dirent *ent;
+        std::vector<std::string> files;
         
         //load contents for every folder in the list
         std::vector<std::string>* folders = &pOpt->add_folderParameter;
@@ -118,7 +120,6 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
             dir = opendir(folder.c_str());
             
             //load file names and sort them
-            std::vector<std::string> files;
             while ((ent = readdir (dir)) != NULL)
             {
                 std::string filename(ent->d_name);
@@ -142,24 +143,25 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
                         }
                         else
                         {
-                            VERBOSE(1, "skipping non-supported file type in file \"" << filename << "\"" << std::endl);
+                            VERBOSE(1, "skipping non-supported file type in file \"" << folder+filename << "\"" << std::endl);
                         }
                     }
                     else
                     {
-                        VERBOSE(1, "skipping non-regular file \"" << filename << "\"" << std::endl);
+                        VERBOSE(1, "skipping non-regular file \"" << folder+filename << "\"" << std::endl);
                     }
                 }
             }
-            std::sort(files.begin(), files.end());
             closedir(dir);
-            
-            for (std::vector<std::string>::const_iterator file = files.begin(); file != files.end(); file++)
+        }
+        
+        std::sort(files.begin(), files.end());
+        for (unsigned int i=0; i < files.size(); i++)
+        {
+            VERBOSE(0, std::fixed << std::setprecision(2) << 100.0*double(i)/double(files.size()) << "%, ");
+            if (addFileToDB(conn, proc, cProc, files[i]) == 0)
             {
-                if (addFileToDB(conn, proc, cProc, *file) == 0)
-                {
-                    ERROR_OUT("adding file failed.", 10);
-                }
+                ERROR_OUT("adding file failed.", 10);
             }
         }
     }
