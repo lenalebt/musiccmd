@@ -610,7 +610,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = ${music_HEADERS_WHITESPACE} ${music_SOURCES_WHITESPACE}
+INPUT                  = ${musiccmd_HEADERS_WHITESPACE} ${musiccmd_SOURCES_WHITESPACE}
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -1430,7 +1430,7 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by
 # the preprocessor.
 
-INCLUDE_PATH           = ${music_INCLUDES_WHITESPACE}
+INCLUDE_PATH           = ${musiccmd_INCLUDES_WHITESPACE}
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
