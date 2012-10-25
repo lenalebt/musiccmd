@@ -21,7 +21,7 @@
 /// @subsection mainpage_usage_twolines Short introduction
 /// This is a short three-line example of <code>musiccmd</code>:
 /// @code
-/// #add all files in /path/to/files to database (may take a long! time), show progress
+/// #add all files in /path/to/files to database (may take a long! time, approx. 2files/min), show progress
 /// ./musiccmd -v -i --add-folder /path/to/files
 /// 
 /// #add new category "test"
