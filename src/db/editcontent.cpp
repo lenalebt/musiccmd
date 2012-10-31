@@ -228,7 +228,10 @@ bool recalculate_category(music::DatabaseConnection* conn, music::Classification
         
         if (category.getCategoryDescription() != NULL)
         {
-            VERBOSE_DB(3, "    new timbre model: " << category.getCategoryDescription()->getTimbreModel());
+            VERBOSE_DB(3, "    new positive timbre model: " << category.getCategoryDescription()->getPositiveTimbreModel());
+            VERBOSE_DB(3, "    new negative timbre model: " << category.getCategoryDescription()->getNegativeTimbreModel());
+            VERBOSE_DB(3, "    new positive chroma model: " << category.getCategoryDescription()->getPositiveChromaModel());
+            VERBOSE_DB(3, "    new negative chroma model: " << category.getCategoryDescription()->getNegativeChromaModel());
         }
     }
     

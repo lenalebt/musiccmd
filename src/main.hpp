@@ -9,6 +9,16 @@
 /// <code>musiccmd</code> is a frontend for <code>libmusic</code>; 
 /// <code>libmusic</code> classifies music, based on the files contents rather than their tag infos.
 /// 
+/// @section mainpage_install Install
+/// To install this package, you need to install some other packages:
+///  * <code>libmusic</code> which you should get where you got this program
+///  * <code>libmusicaccess</code> (dependency of <code>libmusic</code>, same source)
+///  * <code>Eigen</code> >= 3.0 (can be obtained from http://eigen.tuxfamily.org, 3.0.6 is known to work)
+///  * <code>Boost program_options</code> (see http://www.boost.org)
+///  * <code>cmake</code> (see http://www.cmake.org)
+///  * <code>doxygen</code> (optional, see http://www.doxygen.org)
+/// 
+/// 
 /// @section mainpage_usage Usage
 /// <code>music</code> is able to build user-specified categories of music. To
 /// create an own category, you need to first add all your files to the database

@@ -79,8 +79,10 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
             << artist << "\", album=\"" << album << "\", filename=\"" << filename << "\"" << std::endl);
         
         databaseentities::Category cat;
-        GaussianMixtureModel<kiss_fft_scalar>* catTimbreModel = NULL;
-        GaussianMixtureModel<kiss_fft_scalar>* catChromaModel = NULL;
+        GaussianMixtureModel<kiss_fft_scalar>* catPositiveTimbreModel = NULL;
+        GaussianMixtureModel<kiss_fft_scalar>* catNegativeTimbreModel = NULL;
+        GaussianMixtureModel<kiss_fft_scalar>* catPositiveChromaModel = NULL;
+        GaussianMixtureModel<kiss_fft_scalar>* catNegativeChromaModel = NULL;
         if (pOpt->show_timbre_scores)
         {
             VERBOSE(2, "loading timbre model for category " << pOpt->show_timbre_scoresParameter << "." << std::endl);
@@ -108,7 +110,10 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
             
             conn->getCategoryByID(cat, true);
             if (cat.getCategoryDescription() != NULL)
-                catTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getTimbreModel());
+            {
+                catPositiveTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getPositiveTimbreModel());
+                catNegativeTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getNegativeTimbreModel());
+            }
             else
             {
                 VERBOSE(0, "chosen category has no category description, which may not happen." << std::endl;)
@@ -142,7 +147,10 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
             
             conn->getCategoryByID(cat, true);
             if (cat.getCategoryDescription() != NULL)
-                catChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getChromaModel());
+            {
+                catPositiveChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getPositiveChromaModel());
+                catNegativeChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(cat.getCategoryDescription()->getNegativeChromaModel());
+            }
             else
             {
                 VERBOSE(0, "chosen category has no category description, which may not happen." << std::endl;)
@@ -169,10 +177,18 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
                     GaussianMixtureModel<kiss_fft_scalar>* songTimbreModel = NULL;
                     songTimbreModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getTimbreModel());
                     
-                    double scoreA = songTimbreModel->compareTo(*catTimbreModel);
-                    double scoreB = catTimbreModel->compareTo(*songTimbreModel);
+                    double scoreA = songTimbreModel->compareTo(*catPositiveTimbreModel);
+                    double scoreB = catPositiveTimbreModel->compareTo(*songTimbreModel);
                     
-                    VERBOSE(0, scoreA);
+                    VERBOSE(0, "positive:" << scoreA);
+                    VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
+                        << scoreB << " for model-to-song)");
+                    VERBOSE(0, std::endl);
+                    
+                    scoreA = songTimbreModel->compareTo(*catNegativeTimbreModel);
+                    scoreB = catNegativeTimbreModel->compareTo(*songTimbreModel);
+                    
+                    VERBOSE(0, "negative:" << scoreA);
                     VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
                         << scoreB << " for model-to-song)");
                     VERBOSE(0, std::endl);
@@ -193,10 +209,18 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
                     GaussianMixtureModel<kiss_fft_scalar>* songChromaModel = NULL;
                     songChromaModel = GaussianMixtureModel<kiss_fft_scalar>::loadFromJSONString(rec.getRecordingFeatures()->getChromaModel());
                     
-                    double scoreA = songChromaModel->compareTo(*catChromaModel);
-                    double scoreB = catChromaModel->compareTo(*songChromaModel);
+                    double scoreA = songChromaModel->compareTo(*catPositiveChromaModel);
+                    double scoreB = catPositiveChromaModel->compareTo(*songChromaModel);
                     
-                    VERBOSE(0, scoreA);
+                    VERBOSE(0, "positive: " << scoreA);
+                    VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
+                        << scoreB << " for model-to-song)");
+                    VERBOSE(0, std::endl);
+                    
+                    scoreA = songChromaModel->compareTo(*catNegativeChromaModel);
+                    scoreB = catNegativeChromaModel->compareTo(*songChromaModel);
+                    
+                    VERBOSE(0, "negative: " << scoreA);
                     VERBOSE_DB(2, " (built from " << scoreA << " for song-to-model and "
                         << scoreB << " for model-to-song)");
                     VERBOSE(0, std::endl);
@@ -211,10 +235,14 @@ bool search_artist_album_title_filename(music::DatabaseConnection* conn)
             }
         }
         
-        if (catTimbreModel)
-            delete catTimbreModel;
-        if (catChromaModel)
-            delete catChromaModel;
+        if (catPositiveTimbreModel)
+            delete catPositiveTimbreModel;
+        if (catPositiveChromaModel)
+            delete catPositiveChromaModel;
+        if (catNegativeTimbreModel)
+            delete catNegativeTimbreModel;
+        if (catNegativeChromaModel)
+            delete catNegativeChromaModel;
     }
     
     return true;
@@ -286,8 +314,10 @@ void displayCategoryDetails(const music::databaseentities::Category& cat)
     if (cat.getCategoryDescription() != NULL)
     {
         VERBOSE_DB(3, "\t classifier description: " << cat.getCategoryDescription()->getClassifierDescription() << std::endl);
-        VERBOSE_DB(3, "\t timbre model:           " << cat.getCategoryDescription()->getTimbreModel() << std::endl);
-        VERBOSE_DB(3, "\t chroma model:           " << cat.getCategoryDescription()->getChromaModel() << std::endl);
+        VERBOSE_DB(3, "\t positive timbre model:  " << cat.getCategoryDescription()->getPositiveTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t positive chroma model:  " << cat.getCategoryDescription()->getPositiveChromaModel() << std::endl);
+        VERBOSE_DB(3, "\t negative timbre model:  " << cat.getCategoryDescription()->getNegativeTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t negative chroma model:  " << cat.getCategoryDescription()->getNegativeChromaModel() << std::endl);
     }
     else
     {
