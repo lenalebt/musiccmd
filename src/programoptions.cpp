@@ -120,7 +120,7 @@ int parseProgramOptions(int argc, char* argv[])
         ("chroma-timeslice-size", po::value<double>(&pOpt->chroma_timeslice_size)->default_value(0.0625),
             "Set the size of the time slices for chroma vector extraction, in seconds. "
             "Typical values are in the range of 0.05 to 0.3.")
-        ("chroma-modelsize", po::value<unsigned int>(&pOpt->chroma_modelsize)->default_value(20),
+        ("chroma-modelsize", po::value<unsigned int>(&pOpt->chroma_modelsize)->default_value(10),
             "Set the model size of the chroma vectors, i.e. the number "
             "of normal distributions used to model the chroma vectors. "
             "Typical values are in the range of 8 to 20. You should set "
@@ -131,14 +131,14 @@ int parseProgramOptions(int argc, char* argv[])
     po::options_description optFineTuneCategoryCreation("Options for category creation fine-tuning");
     optFineTuneCategoryCreation.add_options()
         ("category-timbre-modelsize", po::value<unsigned int>(&pOpt->category_timbre_modelsize)->default_value(60),
-            "Set the model size of the timbre model for a group of songs."
+            "Set the model size of the timbre model for a group of songs. "
             "Typical values are in the range of 20 to 100.")
         ("category-timbre-persong-samplesize", po::value<unsigned int>(&pOpt->category_timbre_persong_samplesize)->default_value(20000),
             "Set the number of samples drawn from the timbre model for one song to "
             "build the model for a group of songs. "
             "Typical values are in the range of 1000 to 30000.")
-        ("category-chroma-modelsize", po::value<unsigned int>(&pOpt->category_chroma_modelsize)->default_value(30),
-            "Set the model size of the chroma model for a group of songs."
+        ("category-chroma-modelsize", po::value<unsigned int>(&pOpt->category_chroma_modelsize)->default_value(10),
+            "Set the model size of the chroma model for a group of songs. "
             "Typical values are in the range of 8 to 20.")
         ("category-chroma-persong-samplesize", po::value<unsigned int>(&pOpt->category_chroma_persong_samplesize)->default_value(2000),
             "Set the number of samples drawn from the chroma model for one song to "

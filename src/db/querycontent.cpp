@@ -289,7 +289,7 @@ bool show_category(music::DatabaseConnection* conn)
             {
                 VERBOSE_DB(2, "50 best matches for this category:" << std::endl);
                 std::vector<std::pair<databaseentities::id_datatype, double> > recordingIDsAndScores;
-                conn->getRecordingIDsInCategory(recordingIDsAndScores, cat.getID(), 0.0, 1000.0, 5000);
+                conn->getRecordingIDsInCategory(recordingIDsAndScores, cat.getID(), -1.0, 1000.0, 5000);
                 for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
                 {
                     databaseentities::Recording rec;
@@ -313,11 +313,12 @@ void displayCategoryDetails(const music::databaseentities::Category& cat)
     VERBOSE_DB(1, "\t some features still missing (members, etc.)" << std::endl);
     if (cat.getCategoryDescription() != NULL)
     {
-        VERBOSE_DB(3, "\t classifier description: " << cat.getCategoryDescription()->getClassifierDescription() << std::endl);
-        VERBOSE_DB(3, "\t positive timbre model:  " << cat.getCategoryDescription()->getPositiveTimbreModel() << std::endl);
-        VERBOSE_DB(3, "\t positive chroma model:  " << cat.getCategoryDescription()->getPositiveChromaModel() << std::endl);
-        VERBOSE_DB(3, "\t negative timbre model:  " << cat.getCategoryDescription()->getNegativeTimbreModel() << std::endl);
-        VERBOSE_DB(3, "\t negative chroma model:  " << cat.getCategoryDescription()->getNegativeChromaModel() << std::endl);
+        VERBOSE_DB(3, "\t positive classifier description: " << cat.getCategoryDescription()->getPositiveClassifierDescription() << std::endl);
+        VERBOSE_DB(3, "\t negative classifier description: " << cat.getCategoryDescription()->getNegativeClassifierDescription() << std::endl);
+        VERBOSE_DB(3, "\t positive timbre model:           " << cat.getCategoryDescription()->getPositiveTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t positive chroma model:           " << cat.getCategoryDescription()->getPositiveChromaModel() << std::endl);
+        VERBOSE_DB(3, "\t negative timbre model:           " << cat.getCategoryDescription()->getNegativeTimbreModel() << std::endl);
+        VERBOSE_DB(3, "\t negative chroma model:           " << cat.getCategoryDescription()->getNegativeChromaModel() << std::endl);
     }
     else
     {
