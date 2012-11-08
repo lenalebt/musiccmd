@@ -288,13 +288,41 @@ bool show_category(music::DatabaseConnection* conn)
             if (pOpt->db_verbosity_level >= 1)
             {
                 VERBOSE_DB(1, "group members:" << std::endl);
+                VERBOSE_DB(1, "  positive:");
+                std::vector<std::pair<databaseentities::id_datatype, double> > recordingIDsAndScores;
+                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), -1.1, 0.0);
+                VERBOSE_DB(1, recordingIDsAndScores.size() << " members" << std::endl);
+                for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
+                {
+                    databaseentities::Recording rec;
+                    rec.setID(it->first);
+                    conn->getRecordingByID(rec, false);
+                    VERBOSE_DB(1, "    " << std::left << std::setw(30) << rec.getArtist()
+                        << " (" << std::left << std::setw(30) << rec.getAlbum() << ")"
+                        << " - " << std::left << std::setw(30) << rec.getTitle() << std::endl);
+                }
+                recordingIDsAndScores.clear();
+                
+                VERBOSE_DB(1, "  negative: ");
+                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), 0.0, 1.1);
+                VERBOSE_DB(1, recordingIDsAndScores.size() << " members" << std::endl);
+                for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
+                {
+                    databaseentities::Recording rec;
+                    rec.setID(it->first);
+                    conn->getRecordingByID(rec, false);
+                    VERBOSE_DB(1, "    " << std::left << std::setw(30) << rec.getArtist()
+                        << " (" << std::left << std::setw(30) << rec.getAlbum() << ")"
+                        << " - " << std::left << std::setw(30) << rec.getTitle() << std::endl);
+                }
+                recordingIDsAndScores.clear();
                 
             }
             if (pOpt->db_verbosity_level >= 2)
             {
                 VERBOSE_DB(2, "50 best matches for this category:" << std::endl);
                 std::vector<std::pair<databaseentities::id_datatype, double> > recordingIDsAndScores;
-                conn->getRecordingIDsInCategory(recordingIDsAndScores, cat.getID(), -1.0, 1000.0, 5000);
+                conn->getRecordingIDsInCategory(recordingIDsAndScores, cat.getID(), -1.0, 1000.0, 50);
                 for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
                 {
                     databaseentities::Recording rec;
