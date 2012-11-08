@@ -285,6 +285,11 @@ bool show_category(music::DatabaseConnection* conn)
             conn->getCategoryByID(cat, true);
             VERBOSE_DB(0, "category found: \"" << cat.getCategoryName() << "\"" << std::endl);
             displayCategoryDetails(cat);
+            if (pOpt->db_verbosity_level >= 1)
+            {
+                VERBOSE_DB(1, "group members:" << std::endl);
+                
+            }
             if (pOpt->db_verbosity_level >= 2)
             {
                 VERBOSE_DB(2, "50 best matches for this category:" << std::endl);
