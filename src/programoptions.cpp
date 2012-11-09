@@ -76,6 +76,16 @@ int parseProgramOptions(int argc, char* argv[])
             "wildcards \"*\" and \"?\".")
         ("remove-category", po::value<std::string>(&pOpt->remove_categoryParameter),
             "Remove a category with the given name.")   //TODO (delete everything, category-memberships and examples, too!)
+        ("export-category", po::value<std::vector<std::string> >()->multitoken(),
+            "Exports the best matches of a category to a playlist file. "
+            "You need to supply the name of the category, a filename, and "
+            "optionally the number of matches that should be exported, in this order. "
+            "Example:\n"
+            "\t./musiccmd --export-category classical classical.m3u\n"
+            "\t./musiccmd --export-category metal metal.m3u 100\n"
+            "If you do not give the number of recordings that should be "
+            "saved to the playlist, a default of 100 will be assumed. Allowed file "
+            "types for the playlists are m3u and pls.")
         ;
     
     po::options_description optQueryDB("Options for querying the database");

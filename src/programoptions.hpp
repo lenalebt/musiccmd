@@ -92,6 +92,9 @@ public:
     bool remove_category;
     std::string remove_categoryParameter;
     
+    bool export_category;
+    std::vector<std::string> export_categoryParameter;
+    
     //options for feature extraction fine-tuning
     double       timbre_timeslice_size;
     unsigned int timbre_dimension;

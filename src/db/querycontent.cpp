@@ -288,10 +288,10 @@ bool show_category(music::DatabaseConnection* conn)
             if (pOpt->db_verbosity_level >= 1)
             {
                 VERBOSE_DB(1, "group members:" << std::endl);
-                VERBOSE_DB(1, "  positive:");
+                VERBOSE_DB(1, "  positive: ");
                 std::vector<std::pair<databaseentities::id_datatype, double> > recordingIDsAndScores;
-                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), -1.1, 0.0);
-                VERBOSE_DB(1, recordingIDsAndScores.size() << " members" << std::endl);
+                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), 0.0, 1.1);
+                VERBOSE_DB(1, recordingIDsAndScores.size() << " member(s)" << std::endl);
                 for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
                 {
                     databaseentities::Recording rec;
@@ -304,8 +304,8 @@ bool show_category(music::DatabaseConnection* conn)
                 recordingIDsAndScores.clear();
                 
                 VERBOSE_DB(1, "  negative: ");
-                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), 0.0, 1.1);
-                VERBOSE_DB(1, recordingIDsAndScores.size() << " members" << std::endl);
+                conn->getCategoryExampleRecordingIDs(recordingIDsAndScores, cat.getID(), -1.1, 0.0);
+                VERBOSE_DB(1, recordingIDsAndScores.size() << " member(s)" << std::endl);
                 for (std::vector<std::pair<databaseentities::id_datatype, double> >::const_iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
                 {
                     databaseentities::Recording rec;
@@ -313,7 +313,7 @@ bool show_category(music::DatabaseConnection* conn)
                     conn->getRecordingByID(rec, false);
                     VERBOSE_DB(1, "    " << std::left << std::setw(30) << rec.getArtist()
                         << " (" << std::left << std::setw(30) << rec.getAlbum() << ")"
-                        << " - " << std::left << std::setw(30) << rec.getTitle() << std::endl);
+                        << " - " << std::left << std::setw(30) << rec.getTitle() << std:: endl);
                 }
                 recordingIDsAndScores.clear();
                 
