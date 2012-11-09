@@ -1,0 +1,11 @@
+Install
+=======
+
+To install this package, you need to install some other packages:
+
+libmusic which you should get where you got this program
+libmusicaccess (dependency of libmusic, same source)
+Eigen >= 3.0 (can be obtained from http://eigen.tuxfamily.org, 3.0.6 is known to work)
+Boost program_options (see http://www.boost.org)
+cmake (see http://www.cmake.org)
+doxygen (optional, see http://www.doxygen.org)
