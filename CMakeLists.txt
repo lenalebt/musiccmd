@@ -5,7 +5,7 @@ PROJECT(musiccmd)
 
 #version number
 SET (musiccmd_VERSION_MAJOR 0)
-SET (musiccmd_VERSION_MINOR 04)
+SET (musiccmd_VERSION_MINOR 8)
 
 #tell the compiler to include the version number as preprocessor directive
 ADD_DEFINITIONS(-DVERSION=${musiccmd_VERSION_MAJOR}.${musiccmd_VERSION_MINOR})

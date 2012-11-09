@@ -26,8 +26,6 @@
 /// Every category is built from positive and negative examples, you can have an
 /// arbitrary number of examples for every category.
 /// 
-/// @bug for now, only positive examples count for the categories
-/// 
 /// @subsection mainpage_usage_twolines Short introduction
 /// This is a short three-line example of <code>musiccmd</code>:
 /// @code
@@ -41,7 +39,7 @@
 /// #as positive example, all files containing "gold" in the title field as
 /// #negative examples, recalculate category memberships, all for category "test".
 /// 
-/// ./musiccmd --edit-category test add-positive artist %myart% add-negative title %gold%
+/// ./musiccmd -v -i --edit-category test add-positive artist %myart% add-negative title %gold%
 /// @endcode
 /// 
 /// 
@@ -112,9 +110,6 @@
 /// @code{.sh}
 /// ./musiccmd --show-category -i 2
 /// @endcode
-/// @todo For now, no classifier is run on the data. it shows the raw sum
-///     of chroma and timbre similarity, which might not be a good similarity
-///     measure.
 /// 
 /// If you want more verbose output, you can add verbosity switches:
 /// @code{.sh}
