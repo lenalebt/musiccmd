@@ -76,7 +76,7 @@ int parseProgramOptions(int argc, char* argv[])
             "wildcards \"*\" and \"?\".")
         ("remove-category", po::value<std::string>(&pOpt->remove_categoryParameter),
             "Remove a category with the given name.")   //TODO (delete everything, category-memberships and examples, too!)
-        ("export-category", po::value<std::vector<std::string> >()->multitoken(),
+        ("export-category", po::value<std::vector<std::string> >(&pOpt->export_categoryParameter)->multitoken(),
             "Exports the best matches of a category to a playlist file. "
             "You need to supply the name of the category, a filename, and "
             "optionally the number of matches that should be exported, in this order. "
@@ -239,6 +239,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->show_category = true;
     if (vm.count("remove-category"))
         pOpt->remove_category = true;
+    if (vm.count("export-category"))
+        pOpt->export_category = true;
     
     if (vm.count("search"))
         pOpt->search = true;
@@ -298,6 +300,9 @@ ProgramOptions::ProgramOptions() :
     
     remove_category(false),
     remove_categoryParameter(),
+    
+    export_category(false),
+    export_categoryParameter(),
     
     timbre_timeslice_size(0.01),
     timbre_dimension(20),

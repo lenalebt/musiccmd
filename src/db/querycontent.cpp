@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
+#include <fstream>
 
 #include "programoptions.hpp"
 #include "logging.hpp"
@@ -267,6 +269,50 @@ void displayRecordingDetails(const databaseentities::Recording& rec)
     {
         VERBOSE_DB(1, "no features found." << std::endl);
     }
+}
+
+bool export_category(music::DatabaseConnection* conn)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    if (pOpt->export_category)
+    {
+        if (pOpt->export_categoryParameter.size() < 2)
+        {
+            VERBOSE(0, "you need to give at least 2 parameters: the first is the name of the category, the second is the file name of the playlist.");
+            return false;
+        }
+        else if (pOpt->export_categoryParameter.size() > 3)
+        {
+            VERBOSE(0, "the maximum number of parameters is 3.");
+            return false;
+        }
+        
+        std::string categoryName = pOpt->export_categoryParameter[0];
+        std::string playlistFilename = pOpt->export_categoryParameter[1];
+        int numberOfFiles = 100;
+        if (pOpt->export_categoryParameter.size() == 3)
+        {
+            std::stringstream stream;
+            stream << pOpt->export_categoryParameter[2];
+            stream >> numberOfFiles;
+        }
+        
+        std::ofstream file(playlistFilename.c_str());
+        std::vector<std::pair<music::databaseentities::id_datatype, double> > recordingIDsAndScores;
+        
+        conn->getRecordingIDsInCategory(recordingIDsAndScores, -1.1, 1.1, numberOfFiles);
+        for (std::vector<std::pair<music::databaseentities::id_datatype, double> >::iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
+        {
+            databaseentities::Recording rec;
+            rec.setID(it->first);
+            conn->getRecordingByID(rec, false);
+            
+            //TODO: save rec to playlist file
+            file << rec.getFilename() << std::endl;
+        }
+    }
+    
+    return true;
 }
 
 bool show_category(music::DatabaseConnection* conn)

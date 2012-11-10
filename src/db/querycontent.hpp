@@ -11,4 +11,6 @@ bool show_category(music::DatabaseConnection* conn);
 
 void displayCategoryDetails(const music::databaseentities::Category& cat);
 
+bool export_category(music::DatabaseConnection* conn);
+
 #endif //DB_QUERYCONTENT_HPP

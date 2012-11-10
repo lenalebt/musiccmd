@@ -86,6 +86,14 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
+    if (!export_category(conn))
+    {
+        ERROR_OUT("failed to export category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
     if (!search_artist_album_title_filename(conn))
     {
         ERROR_OUT("failed to search. aborting.", 0);
