@@ -18,7 +18,66 @@
 ///  * <code>cmake</code> (see http://www.cmake.org)
 ///  * <code>doxygen</code> (optional, see http://www.doxygen.org)
 /// 
+/// @subsection mainpage_normal_install Installing on a normal *nix system
 /// 
+/// If you want to install the library in a normal, 
+/// non-cross-compile-environment, just go to the "build/" directory and
+/// type
+/// 
+/// @code{.sh}
+/// cmake -DCMAKE_BUILD_TYPE=Release ..
+/// make -j5
+/// make install
+/// @endcode
+/// 
+/// The last step might require root privileges. If you want to build 
+/// the docs and have doxygen installed, type
+/// 
+/// @code{.sh}
+/// make doc
+/// @endcode
+/// 
+/// in the very same directory. You will find the docs in the api-doc/ 
+/// directory. There are two formats available, for the more common HTML
+/// version open the file <code>api-doc/html/index.html</code>. The
+/// LaTeX version needs to be compiled, which is possible via
+/// @code{.sh}
+/// cd api-doc/latex/
+/// pdflatex refman.tex
+/// pdflatex refman.tex
+/// @endcode
+/// if you have LaTeX installed. Running LaTeX twice is necessary to get
+/// cross-references and some citations right.
+/// If you don't care about them, a single run is sufficient.
+/// You may now open the file <code>refman.pdf</code> with a 
+/// <a href="http://pdfreaders.org/">PDF reader of your choice</a>..
+/// 
+/// @subsection mainpage_crosscompilation_install Installing for Cross-Compilation
+/// 
+/// If you want to cross-compile and install the library, you need to 
+/// build the library with a cmake toolchain file and afterwards copy 
+/// the files manually to the right directories. This step highly 
+/// depends on the environment you are using.
+/// 
+/// Example: Blackberry Playbook NDK 2.0.1
+/// 
+/// Assuming you installed the NDK in <code>/opt/bbndk-2.0.1/</code>, you need to:
+/// - build the library:
+///     * go to the <code>build/</code> directory. Type:
+///         @code{.sh}
+///         cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/modules/Toolchain-QNX-6.5.0-armv7.cmake ..
+///         make -j4
+///         @endcode
+///         Sometimes, <code>cmake</code> is not able to find Boost properly. In this
+///         case, you may help cmake by typing
+///         @code{.sh}
+///         cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/modules/Toolchain-QNX-6.5.0-armv7.cmake -DBOOST_LIBRARY_DIR=/opt/bbndk-2.0.1/target/qnx6/armle-v7/usr/lib/boost-1_48/ ..
+///         make -j4
+///         @endcode
+/// 
+/// If you have trouble building boost for the Blackberry Playbook, see
+/// https://github.com/blackberry/Boost
+///
 /// @section mainpage_usage Usage
 /// <code>music</code> is able to build user-specified categories of music. To
 /// create an own category, you need to first add all your files to the database
