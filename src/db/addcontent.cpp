@@ -110,9 +110,9 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
         
         //load contents for every folder in the list
         std::vector<std::string>* folders = &pOpt->add_folderParameter;
-        for (std::vector<std::string>::const_iterator it_folder = folders->begin(); it_folder != folders->end(); it_folder++)
+        for (std::vector<std::string>::size_type i = 0; i < folders->size(); i++)
         {
-            std::string folder = *it_folder;
+            std::string folder = (*folders)[i];
             if (!endsWith(folder, "/"))
                 folder += "/";
             
@@ -145,6 +145,10 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
                         {
                             VERBOSE(1, "skipping non-supported file type in file \"" << folder+filename << "\"" << std::endl);
                         }
+                    }
+                    else if (S_ISDIR(buf.st_mode) && pOpt->add_recursive_directories)
+                    {
+                        folders->push_back(filename);
                     }
                     else
                     {

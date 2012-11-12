@@ -1,6 +1,6 @@
 # Find libmusic
 #
-# MUSIC_INCLUDE_DIR - where to find music.hpp, etc.
+# MUSIC_INCLUDE_DIR - where to find MUSIC.hpp, etc.
 # MUSIC_LIBRARIES - List of libraries when using libMUSIC.
 # MUSIC_FOUND - True if libMUSIC found.
 
@@ -9,9 +9,11 @@ IF(MUSIC_INCLUDE_DIR)
     SET(MUSIC_FIND_QUIETLY TRUE)
 ENDIF(MUSIC_INCLUDE_DIR)
 
-FIND_PATH(MUSIC_INCLUDE_DIR music.hpp)
+FIND_PATH(MUSIC_INCLUDE_DIR music.hpp PATHS
+        ${CMAKE_INSTALL_PREFIX}/include)
 
-FIND_LIBRARY(MUSIC_LIBRARY NAMES music)
+FIND_LIBRARY(MUSIC_LIBRARY NAMES music PATHS
+        /usr/lib /usr/local/lib /armle-v7/usr/lib /armle-v7/lib)
 
 # Handle the QUIETLY and REQUIRED arguments and set MUSIC_FOUND to TRUE if
 # all listed variables are TRUE.

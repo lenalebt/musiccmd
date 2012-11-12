@@ -63,6 +63,7 @@ public:
     std::vector<std::string> add_folderParameter;
     
     bool replace_if_found;
+    bool add_recursive_directories;
     
     //options for database queries
     bool search;

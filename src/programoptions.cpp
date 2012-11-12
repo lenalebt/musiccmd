@@ -52,6 +52,9 @@ int parseProgramOptions(int argc, char* argv[])
             "more than one folder.")
         ("replace-if-found,x", "Replace files that are found in the database "
             "while adding new files, instead of skipping them.")
+        ("add-recursive-directories,r", "When adding directories with -A, "
+            "add all subfolders, too. The program follows symlinks, so be sure you do not have any "
+            "links back to higher levels.")
         ("clean-db", "Look for files that are no longer available and delete them from the database.")
         ;
     
@@ -228,6 +231,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->add_folder = true;
     if (vm.count("replace-if-found"))
         pOpt->replace_if_found = true;
+    if (vm.count("add-recursive-directories"))
+        pOpt->replace_if_found = true;
     
     if (vm.count("add-category"))
         pOpt->add_category = true;
@@ -274,6 +279,7 @@ ProgramOptions::ProgramOptions() :
     add_folderParameter(),
     
     replace_if_found(false),
+    add_recursive_directories(false),
     
     search(false),
     searchParameter(),
