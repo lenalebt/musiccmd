@@ -51,7 +51,7 @@ FIND_PACKAGE(Doxygen)
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
 
-set(Boost_ADDITIONAL_VERSIONS "1.40.1" "1.44" "1.44.0" "1.46" "1.46.0" "1.46.1")
+set(Boost_ADDITIONAL_VERSIONS "1.40.1" "1.44" "1.44.0" "1.46" "1.46.0" "1.46.1" "1.48" "1.48.0" "1.51" "1.51.1")
 FIND_PACKAGE(Boost 1.46.1
     COMPONENTS
     program_options
