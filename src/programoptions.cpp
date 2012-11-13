@@ -232,7 +232,7 @@ int parseProgramOptions(int argc, char* argv[])
     if (vm.count("replace-if-found"))
         pOpt->replace_if_found = true;
     if (vm.count("add-recursive-directories"))
-        pOpt->replace_if_found = true;
+        pOpt->add_recursive_directories = true;
     
     if (vm.count("add-category"))
         pOpt->add_category = true;

@@ -116,7 +116,7 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
             if (!endsWith(folder, "/"))
                 folder += "/";
             
-            VERBOSE(2, "opening folder \"" << folder << "\"." << std::endl);
+            VERBOSE(2, "opening folder \"" << folder << "\"" << std::endl);
             dir = opendir(folder.c_str());
             
             //load file names and sort them
@@ -146,9 +146,14 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
                             VERBOSE(1, "skipping non-supported file type in file \"" << folder+filename << "\"" << std::endl);
                         }
                     }
-                    else if (S_ISDIR(buf.st_mode) && pOpt->add_recursive_directories)
+                    else if (S_ISDIR(buf.st_mode))
                     {
-                        folders->push_back(filename);
+                        if (pOpt->add_recursive_directories && (filename != "..") && (filename != "."))
+                        {
+                            folders->push_back(folder+filename);
+                        }
+                        else
+                            {VERBOSE(1, "skipping folder \"" << folder+filename << "\"" << std::endl);}
                     }
                     else
                     {
