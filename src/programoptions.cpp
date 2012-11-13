@@ -37,6 +37,8 @@ int parseProgramOptions(int argc, char* argv[])
             "Set database file (where to store results etc.).")
         ("version", "Show version number and exit.")
         ("test", po::value<std::string>(&pOpt->testParameter), "Run test with given name.")
+        ("threads,t", po::value<unsigned int>(&pOpt->threadCount)->default_value(2),
+            "Set the maximum number of threads used for processing.")
         ("verbosity,v", po::value<unsigned int>(&pOpt->verbosity_level)
             ->implicit_value(1)->default_value(0), 
             "Set verbosity level. Higher numbers indicate more verbosity.")
@@ -319,7 +321,9 @@ ProgramOptions::ProgramOptions() :
     category_timbre_modelsize(60),
     category_timbre_persong_samplesize(20000),
     category_chroma_modelsize(8),
-    category_chroma_persong_samplesize(2000)
+    category_chroma_persong_samplesize(2000),
+    
+    threadCount(1)
 {
     
 }

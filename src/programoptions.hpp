@@ -108,5 +108,8 @@ public:
     unsigned int category_timbre_persong_samplesize;
     unsigned int category_chroma_modelsize;
     unsigned int category_chroma_persong_samplesize;
+    
+    //options for processing, general
+    unsigned int threadCount;
 };
 #endif      //PROGRAMOPTIONS_HPP
