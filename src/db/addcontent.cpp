@@ -30,6 +30,13 @@ int addFileToDB(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
     //check if the file already is in the database...
     char* realfilename_c = NULL;
     realfilename_c = realpath(filename.c_str(), NULL);
+    
+    if (realfilename_c == NULL)
+    {
+        VERBOSE(0, "file did not exist or read error: \"" << filename << "\", skipping..." << std::endl);
+        return 0;
+    }
+    
     std::string realfilename(realfilename_c);
     free(realfilename_c);
     if (conn->getRecordingIDByFilename(recordingID, realfilename))
@@ -119,8 +126,14 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
             VERBOSE(2, "opening folder \"" << folder << "\"" << std::endl);
             dir = opendir(folder.c_str());
             
+            if (dir == NULL)
+            {
+                VERBOSE(0, "folder did not exist or read error: \"" << folder << "\", skipping..." << std::endl);
+                continue;
+            }
+            
             //load file names and sort them
-            while ((ent = readdir (dir)) != NULL)
+            while ((ent = readdir(dir)) != NULL)
             {
                 std::string filename(ent->d_name);
                 struct stat buf;
