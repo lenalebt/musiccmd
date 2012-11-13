@@ -17,6 +17,7 @@
 
 using namespace music;
 
+#if 0
 /**
  * @brief Adds a file to the database.
  * @return <code>1</code> if the operation succeeded, <code>0</code> if not; <code>-1</code>
@@ -85,27 +86,49 @@ int addFileToDB(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
         return 0;
     }
 }
+#endif
 
-bool add_file(music::DatabaseConnection* conn, music::FilePreprocessor& proc, music::ClassificationProcessor& cProc)
+bool addFilesToDB(music::DatabaseConnection* conn, music::MultithreadedFilePreprocessor& proc, music::ClassificationProcessor& cProc, std::vector<std::string>& files)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    
+    music::OutputStreamCallback osc;
+    //preprocess files...
+    if (proc.preprocessFiles(files, pOpt->threadCount, &osc))
+    {
+        //TODO: calculate scores for all files.
+        /*
+        databaseentities::Recording recording;
+        recording.setID(recordingID);
+        conn->getRecordingByID(recording, true);
+        cProc.addRecording(recording);
+        * */
+    }
+    else
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+bool add_file(music::DatabaseConnection* conn, music::MultithreadedFilePreprocessor& proc, music::ClassificationProcessor& cProc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->add_file)
     {
         VERBOSE(0, "add files to database." << std::endl);
         std::vector<std::string>* files = &pOpt->add_fileParameter;
-        for (unsigned int i=0; i < files->size(); i++)
+        std::sort(files->begin(), files->end());
+        if (!addFilesToDB(conn, proc, cProc, *files))
         {
-            VERBOSE(0, std::fixed << std::setprecision(2) << 100.0*double(i)/double(files->size()) << "%, ");
-            if (addFileToDB(conn, proc, cProc, (*files)[i]) == 0)
-            {
-                ERROR_OUT("adding file failed.", 10);
-            }
+            ERROR_OUT("adding files failed.", 10);
         }
     }
     
     return true;
 }
-bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, music::ClassificationProcessor& cProc)
+bool add_folder(music::DatabaseConnection* conn, music::MultithreadedFilePreprocessor& proc, music::ClassificationProcessor& cProc)
 {
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->add_folder)
@@ -151,8 +174,42 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
                             //|| endswith(loweredfilename, ".aac")
                             )
                         {
-                            files.push_back(folder + filename);
-                            //std::cerr << filename << std::endl;
+                            
+                            //check if the file already is in the database...
+                            char* realfilename_c = NULL;
+                            realfilename_c = realpath((folder + filename).c_str(), NULL);
+                            
+                            if (realfilename_c == NULL)
+                            {
+                                VERBOSE(0, "file did not exist or read error: \"" << (folder + filename) << "\", skipping..." << std::endl);
+                                return 0;
+                            }
+                            
+                            std::string realfilename(realfilename_c);
+                            free(realfilename_c);
+                            music::databaseentities::id_datatype recordingID = -1;
+                            if (conn->getRecordingIDByFilename(recordingID, realfilename))
+                            {
+                                if (recordingID != -1)
+                                {
+                                    if (pOpt->replace_if_found)
+                                    {
+                                        VERBOSE(1, "file \"" << realfilename << "\" already in database, replacing." << std::endl);
+                                        conn->deleteRecordingByID(recordingID);
+                                        files.push_back(folder + filename);
+                                    }
+                                    else
+                                    {
+                                        VERBOSE(1, "file \"" << realfilename << "\" already in database, skipping." << std::endl);
+                                    }
+                                }
+                                else
+                                    files.push_back(folder + filename);
+                            }
+                            else
+                            {
+                                VERBOSE(0, "database error. trying to go on...");
+                            }
                         }
                         else
                         {
@@ -178,13 +235,9 @@ bool add_folder(music::DatabaseConnection* conn, music::FilePreprocessor& proc, 
         }
         
         std::sort(files.begin(), files.end());
-        for (unsigned int i=0; i < files.size(); i++)
+        if (!addFilesToDB(conn, proc, cProc, files))
         {
-            VERBOSE(0, std::fixed << std::setprecision(2) << 100.0*double(i)/double(files.size()) << "%, ");
-            if (addFileToDB(conn, proc, cProc, files[i]) == 0)
-            {
-                ERROR_OUT("adding file failed.", 10);
-            }
+            ERROR_OUT("adding files failed.", 10);
         }
     }
     

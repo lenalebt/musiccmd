@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     DatabaseConnection* conn = new SQLiteDatabaseConnection();
     conn->open(pOpt->dbfile);
     
-    FilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size, pOpt->chroma_modelsize, pOpt->chroma_timeslice_size);
+    MultithreadedFilePreprocessor proc(conn, pOpt->timbre_modelsize, pOpt->timbre_dimension, pOpt->timbre_timeslice_size, pOpt->chroma_modelsize, pOpt->chroma_timeslice_size);
     ClassificationProcessor cProc(conn, pOpt->category_timbre_modelsize, pOpt->category_timbre_persong_samplesize, pOpt->category_chroma_modelsize, pOpt->category_chroma_persong_samplesize);
     
     //first add files, then add folders
