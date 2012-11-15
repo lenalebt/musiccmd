@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 
 int runTest(std::string testname)
 {
-    std::transform(testname.begin(), testname.end(), testname.begin(), (int (*)(int))::tolower);
+    std::transform(testname.begin(), testname.end(), testname.begin(), (int (*)(int))std::tolower);
     std::cerr << "running test \"" << testname << "\"..." << std::endl;
     if (testname == "basename")
         return tests::testBasename();

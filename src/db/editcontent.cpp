@@ -173,7 +173,7 @@ bool edit_category(DatabaseConnection* conn, music::ClassificationProcessor& cPr
         for (std::vector<databaseentities::id_datatype>::const_iterator it = negRecordingIDs.begin(); it != negRecordingIDs.end(); ++it)
             conn->updateCategoryExampleScore(category.getID(), *it, -1.0);
         for (std::vector<databaseentities::id_datatype>::const_iterator it = remRecordingIDs.begin(); it != remRecordingIDs.end(); ++it)
-            conn->updateCategoryExampleScore(category.getID(), *it, sqrt(-1.0));
+            conn->updateCategoryExampleScore(category.getID(), *it, std::sqrt(-1.0));
         conn->endTransaction();
         
         VERBOSE(2, "retrain classifier..." << std::endl);
