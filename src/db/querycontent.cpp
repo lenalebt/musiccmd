@@ -278,12 +278,12 @@ bool export_category(music::DatabaseConnection* conn)
     {
         if (pOpt->export_categoryParameter.size() < 2)
         {
-            VERBOSE(0, "you need to give at least 2 parameters: the first is the name of the category, the second is the file name of the playlist.");
+            VERBOSE(0, "you need to give at least 2 parameters: the first is the name of the category, the second is the file name of the playlist." << std::endl);
             return false;
         }
         else if (pOpt->export_categoryParameter.size() > 3)
         {
-            VERBOSE(0, "the maximum number of parameters is 3.");
+            VERBOSE(0, "the maximum number of parameters is 3." << std::endl);
             return false;
         }
         
@@ -299,8 +299,33 @@ bool export_category(music::DatabaseConnection* conn)
         
         std::ofstream file(playlistFilename.c_str());
         std::vector<std::pair<music::databaseentities::id_datatype, double> > recordingIDsAndScores;
+        databaseentities::id_datatype categoryID;
         
-        conn->getRecordingIDsInCategory(recordingIDsAndScores, -1.1, 1.1, numberOfFiles);
+        std::vector<databaseentities::id_datatype> categoryIDs;
+        conn->getCategoryIDsByName(categoryIDs, categoryName);
+        
+        if (categoryIDs.size() == 0)
+        {   //not found
+            VERBOSE(0, "category not found: \"" << categoryName << "\", aborting." << std::endl);
+            return false;
+        }
+        else if (categoryIDs.size() != 1)
+        {   //too many
+            VERBOSE(0, "found more than one category for search string \"" << pOpt->show_chroma_scoresParameter << "\", aborting." << std::endl);
+            VERBOSE(0, "found categories:" << std::endl);
+            for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+            {
+                databaseentities::Category cat;
+                conn->getCategoryByID(cat, *it);
+                VERBOSE(0, "   " << cat.getCategoryName());
+            }
+            return false;
+        }
+        categoryID = categoryIDs[0];
+        
+        DEBUG_VAR_OUT(recordingIDsAndScores.size(), 0);
+        
+        conn->getRecordingIDsInCategory(recordingIDsAndScores, categoryID, -1.1, 1.1, numberOfFiles);
         for (std::vector<std::pair<music::databaseentities::id_datatype, double> >::iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
         {
             databaseentities::Recording rec;
@@ -309,6 +334,7 @@ bool export_category(music::DatabaseConnection* conn)
             
             //TODO: save rec to playlist file
             file << rec.getFilename() << std::endl;
+            std::cerr << rec.getFilename() << std::endl;
         }
     }
     

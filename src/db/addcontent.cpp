@@ -93,21 +93,22 @@ bool addFilesToDB(music::DatabaseConnection* conn, music::MultithreadedFilePrepr
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     
     music::OutputStreamCallback osc;
+    BlockingQueue<music::databaseentities::id_datatype>* recordingIDQueue;
     //preprocess files...
-    if (proc.preprocessFiles(files, pOpt->threadCount, &osc))
+    recordingIDQueue = proc.preprocessFiles(files, pOpt->threadCount, &osc);
+    music::databaseentities::id_datatype recordingID;
+    
+    VERBOSE(0, "classification processing..." << std::endl);
+    
+    while (recordingIDQueue->dequeue(recordingID))
     {
-        //TODO: calculate scores for all files.
-        /*
         databaseentities::Recording recording;
         recording.setID(recordingID);
         conn->getRecordingByID(recording, true);
         cProc.addRecording(recording);
-        * */
     }
-    else
-    {
-        return false;
-    }
+    
+    delete recordingIDQueue;
     
     return true;
 }
