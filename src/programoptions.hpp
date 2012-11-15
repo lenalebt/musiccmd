@@ -95,6 +95,7 @@ public:
     
     bool export_category;
     std::vector<std::string> export_categoryParameter;
+    bool export_category_absolute_paths;
     
     //options for feature extraction fine-tuning
     double       timbre_timeslice_size;

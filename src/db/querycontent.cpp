@@ -9,6 +9,8 @@
 #include "logging.hpp"
 #include "debug.hpp"
 
+#include "filesystem.hpp"
+
 using namespace music;
 
 bool search_artist_album_title_filename(music::DatabaseConnection* conn)
@@ -288,7 +290,12 @@ bool export_category(music::DatabaseConnection* conn)
         }
         
         std::string categoryName = pOpt->export_categoryParameter[0];
-        std::string playlistFilename = pOpt->export_categoryParameter[1];
+        std::ofstream file(pOpt->export_categoryParameter[1].c_str());
+        
+        char* realfilename_c = NULL;
+        realfilename_c = realpath(pOpt->export_categoryParameter[1].c_str(), NULL);
+        std::string playlistFilename(realfilename_c);
+        
         int numberOfFiles = 100;
         if (pOpt->export_categoryParameter.size() == 3)
         {
@@ -297,7 +304,7 @@ bool export_category(music::DatabaseConnection* conn)
             stream >> numberOfFiles;
         }
         
-        std::ofstream file(playlistFilename.c_str());
+        
         std::vector<std::pair<music::databaseentities::id_datatype, double> > recordingIDsAndScores;
         databaseentities::id_datatype categoryID;
         
@@ -323,7 +330,7 @@ bool export_category(music::DatabaseConnection* conn)
         }
         categoryID = categoryIDs[0];
         
-        DEBUG_VAR_OUT(recordingIDsAndScores.size(), 0);
+        std::string playlistPath = playlistFilename.substr(0, playlistFilename.size() - tests::basename(playlistFilename).size());
         
         conn->getRecordingIDsInCategory(recordingIDsAndScores, categoryID, -1.1, 1.1, numberOfFiles);
         for (std::vector<std::pair<music::databaseentities::id_datatype, double> >::iterator it = recordingIDsAndScores.begin(); it != recordingIDsAndScores.end(); ++it)
@@ -332,9 +339,7 @@ bool export_category(music::DatabaseConnection* conn)
             rec.setID(it->first);
             conn->getRecordingByID(rec, false);
             
-            //TODO: save rec to playlist file
-            file << rec.getFilename() << std::endl;
-            std::cerr << rec.getFilename() << std::endl;
+            file << (pOpt->export_category_absolute_paths ? rec.getFilename() : toRelativePath(playlistPath, rec.getFilename())) << std::endl;
         }
     }
     

@@ -91,6 +91,8 @@ int parseProgramOptions(int argc, char* argv[])
             "If you do not give the number of recordings that should be "
             "saved to the playlist, a default of 100 will be assumed. Allowed file "
             "types for the playlists are m3u and pls.")
+        ("absolute-paths,p", "if this value is set, absolute paths will "
+            "be used in the resulting playlist file.")
         ;
     
     po::options_description optQueryDB("Options for querying the database");
@@ -248,6 +250,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->remove_category = true;
     if (vm.count("export-category"))
         pOpt->export_category = true;
+    if (vm.count("absolute-paths"))
+        pOpt->export_category_absolute_paths = true;
     
     if (vm.count("search"))
         pOpt->search = true;
@@ -311,6 +315,7 @@ ProgramOptions::ProgramOptions() :
     
     export_category(false),
     export_categoryParameter(),
+    export_category_absolute_paths(false),
     
     timbre_timeslice_size(0.01),
     timbre_dimension(20),
