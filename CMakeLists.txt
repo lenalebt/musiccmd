@@ -74,6 +74,7 @@ SET(
     src/tools/console_colors.cpp
     src/tools/logging.cpp
     src/tools/stringhelper.cpp
+    src/tools/filesystem.cpp
     
     #src/debug/
     src/tests/debug.cpp
@@ -97,6 +98,7 @@ SET(
     src/tools/console_colors.hpp
     src/tools/logging.hpp
     src/tools/stringhelper.hpp
+    src/tools/filesystem.hpp
     
     #src/debug/
     src/tests/debug.hpp
@@ -166,6 +168,7 @@ ADD_EXECUTABLE(
 #add unit tests here
 ENABLE_TESTING()
 ADD_TEST(basename                  "musiccmd" "--test" "basename")
+ADD_TEST(torelativepath            "musiccmd" "--test" "torelativepath")
 #use "make test" to start all tests.
 
 #use this to automatically create installation packages for different platforms

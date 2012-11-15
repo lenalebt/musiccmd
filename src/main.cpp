@@ -13,6 +13,8 @@
 #include "removecontent.hpp"
 #include "querycontent.hpp"
 
+#include "filesystem.hpp"
+
 using namespace std;
 using namespace music;
 
@@ -128,6 +130,8 @@ int runTest(std::string testname)
     std::cerr << "running test \"" << testname << "\"..." << std::endl;
     if (testname == "basename")
         return tests::testBasename();
+    if (testname == "torelativepath")
+        return tests::testToRelativePath();
     else
     {
         std::cerr << "test \"" << testname << "\" not found. aborting." << std::endl;
