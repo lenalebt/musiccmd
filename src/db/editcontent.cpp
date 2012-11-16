@@ -11,7 +11,6 @@ bool edit_category(DatabaseConnection* conn, music::ClassificationProcessor& cPr
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     if (pOpt->edit_category)
     {
-        //TODO
         std::vector<databaseentities::id_datatype> posRecordingIDs;
         std::vector<databaseentities::id_datatype> negRecordingIDs;
         std::vector<databaseentities::id_datatype> remRecordingIDs;
@@ -180,9 +179,6 @@ bool edit_category(DatabaseConnection* conn, music::ClassificationProcessor& cPr
         
         OutputStreamCallback osc;
         cProc.recalculateCategory(category, true, &osc);
-        
-        //proc
-        
     }
     
     return true;

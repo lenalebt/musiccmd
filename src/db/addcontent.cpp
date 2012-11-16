@@ -197,7 +197,7 @@ bool add_folder(music::DatabaseConnection* conn, music::MultithreadedFilePreproc
                                     {
                                         VERBOSE(1, "file \"" << realfilename << "\" already in database, replacing." << std::endl);
                                         conn->deleteRecordingByID(recordingID);
-                                        files.push_back(folder + filename);
+                                        files.push_back(realfilename);
                                     }
                                     else
                                     {
@@ -205,7 +205,7 @@ bool add_folder(music::DatabaseConnection* conn, music::MultithreadedFilePreproc
                                     }
                                 }
                                 else
-                                    files.push_back(folder + filename);
+                                    files.push_back(realfilename);
                             }
                             else
                             {
