@@ -86,10 +86,10 @@
 /// arbitrary number of examples for every category.
 /// 
 /// @subsection mainpage_usage_twolines Short introduction
-/// This is a short three-line example of <code>musiccmd</code>:
+/// This is a short four-line example of <code>musiccmd</code>:
 /// @code
 /// #add all files in /path/to/files to database (may take a long! time, approx. 2files/min), show progress
-/// ./musiccmd -v -i --add-folder /path/to/files
+/// ./musiccmd -v -i -r --add-folder /path/to/files
 /// 
 /// #add new category "test"
 /// ./musiccmd --add-category test
@@ -99,6 +99,10 @@
 /// #negative examples, recalculate category memberships, all for category "test".
 /// 
 /// ./musiccmd -v -i --edit-category test add-positive artist %myart% add-negative title %gold%
+/// 
+/// #create a playlist "test.m3u" for 100 best matches in category test
+/// 
+/// ./musiccmd -v -i --export-category test test.m3u
 /// @endcode
 /// 
 /// 
@@ -112,8 +116,8 @@
 /// ./musiccmd --add-folder /path/to/folder/with/files
 /// #adds all files in all first-level subfolders of the given path
 /// ./musiccmd --add-folder /path/to/folder/with/subfolders/*
-/// #adds all files in all first and second-level subfolders
-/// ./musiccmd -A /path/* /path/*/*
+/// #adds all files and recursively all subfolders.
+/// ./musiccmd -A /path/ -r
 ///
 /// #options for adding files
 /// #add file /path/to/file.mp3
@@ -168,6 +172,10 @@
 /// You can show the best matches of your category with
 /// @code{.sh}
 /// ./musiccmd --show-category -i 2
+/// @endcode
+/// or export the best matches to a playlist with
+/// @code{.sh}
+/// ./musiccmd --export-category category_name playlist.m3u number_of_files
 /// @endcode
 /// 
 /// If you want more verbose output, you can add verbosity switches:
