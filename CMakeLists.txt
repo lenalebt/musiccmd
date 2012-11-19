@@ -236,6 +236,7 @@ TARGET_LINK_LIBRARIES(musiccmd
     ${SQLITE3_LIBRARIES}
     ${MUSIC_LIBRARIES}
     ${Boost_LIBRARIES}
+    m
     )
 
 INSTALL (TARGETS musiccmd

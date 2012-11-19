@@ -20,6 +20,8 @@ using namespace music;
 
 int main(int argc, char *argv[])
 {
+    VERBOSE(0, "musiccmd - a commandline interface for libmusic" << std::endl);
+    
     ProgramOptions* pOpt = ProgramOptions::getInstance();
     srand(time(NULL));
     
