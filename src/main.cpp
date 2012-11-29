@@ -14,6 +14,7 @@
 #include "querycontent.hpp"
 
 #include "filesystem.hpp"
+#include "tests.hpp"
 
 using namespace std;
 using namespace music;
@@ -134,6 +135,8 @@ int runTest(std::string testname)
         return tests::testBasename();
     if (testname == "torelativepath")
         return tests::testToRelativePath();
+    if (testname == "stringhelper")
+        return tests::testStringHelper();
     else
     {
         std::cerr << "test \"" << testname << "\" not found. aborting." << std::endl;

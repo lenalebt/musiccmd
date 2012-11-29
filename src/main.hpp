@@ -9,6 +9,8 @@
 /// <code>musiccmd</code> is a frontend for <code>libmusic</code>; 
 /// <code>libmusic</code> classifies music, based on the files contents rather than their tag infos.
 /// 
+/// @tableofcontents
+///
 /// @section mainpage_install Install
 /// To install this package, you need to install some other packages:
 ///  * <code>libmusic</code> which you should get where you got this program
@@ -106,6 +108,16 @@
 /// @endcode
 /// 
 /// 
+/// @subsection mainpage_usage_help Getting help on possible command-line options
+/// <code>musiccmd</code> is a command-line tool. It has built-in help functions, call
+/// @code{.sh}
+/// ./musiccmd --help all
+/// @endcode
+/// for a complete list of all command-line options.
+/// If you leave out <code>all</code>,
+/// you will get a condensed version of the help page.
+/// 
+/// 
 /// @subsection mainpage_usage_short A little more explanation
 /// To add your files to the database, there are two options: One for adding files,
 /// and one for adding all files in a folder. Both options can handle wildcards,
@@ -188,14 +200,6 @@
 /// and option <code>--show-category name</code>).
 /// 
 /// 
-/// @subsection mainpage_usage_help Getting help on possible command-line options
-/// <code>musiccmd</code> is a command-line tool. It has built-in help functions, call
-/// @code{.sh}
-/// ./musiccmd --help all
-/// @endcode
-/// for a complete list of all command-line options.
-/// If you leave out <code>all</code>,
-/// you will get a condensed version of the help page.
 /// 
 /// 
 /// 

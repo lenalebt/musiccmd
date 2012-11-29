@@ -76,9 +76,10 @@ SET(
     src/tools/stringhelper.cpp
     src/tools/filesystem.cpp
     
-    #src/debug/
+    #src/tests/
     src/tests/debug.cpp
     src/tests/testframework.cpp
+    src/tests/tests.cpp
     )
 
 #place header here
@@ -100,9 +101,10 @@ SET(
     src/tools/stringhelper.hpp
     src/tools/filesystem.hpp
     
-    #src/debug/
+    #src/tests/
     src/tests/debug.hpp
     src/tests/testframework.hpp
+    src/tests/tests.hpp
     )
 
 #put all (possibly autocreated) headers and source files here
@@ -169,6 +171,7 @@ ADD_EXECUTABLE(
 ENABLE_TESTING()
 ADD_TEST(basename                  "musiccmd" "--test" "basename")
 ADD_TEST(torelativepath            "musiccmd" "--test" "torelativepath")
+ADD_TEST(stringhelper              "musiccmd" "--test" "stringhelper")
 #use "make test" to start all tests.
 
 #use this to automatically create installation packages for different platforms

@@ -168,11 +168,13 @@ bool add_folder(music::DatabaseConnection* conn, music::MultithreadedFilePreproc
                         std::string loweredfilename = filename;
                         tolower(loweredfilename);
                         
-                        if (endsWith(loweredfilename, ".mp3")
+                        if ((loweredfilename.substr(0,2) != "._") &&
+                               (endsWith(loweredfilename, ".mp3")
                             || endsWith(loweredfilename, ".wav")
                             || endsWith(loweredfilename, ".ogg")
                             || endsWith(loweredfilename, ".flac")
                             //|| endswith(loweredfilename, ".aac")
+                            )
                             )
                         {
                             
