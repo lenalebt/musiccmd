@@ -91,6 +91,9 @@ int parseProgramOptions(int argc, char* argv[])
             "If you do not give the number of recordings that should be "
             "saved to the playlist, a default of 100 will be assumed. Allowed file "
             "types for the playlists are m3u and pls.")
+        ("copy-category", po::value<std::vector<std::string> >(&pOpt->copy_categoryParameter)->multitoken(),
+            "Copies one category to another name. Example:\n"
+            "\t./musiccmd --copy-category one_orig one_copy\n")
         ("absolute-paths,p", "if this value is set, absolute paths will "
             "be used in the resulting playlist file.")
         ;
@@ -250,6 +253,8 @@ int parseProgramOptions(int argc, char* argv[])
         pOpt->remove_category = true;
     if (vm.count("export-category"))
         pOpt->export_category = true;
+    if (vm.count("copy-category"))
+        pOpt->copy_category = true;
     if (vm.count("absolute-paths"))
         pOpt->export_category_absolute_paths = true;
     
@@ -316,6 +321,9 @@ ProgramOptions::ProgramOptions() :
     export_category(false),
     export_categoryParameter(),
     export_category_absolute_paths(false),
+    
+    copy_category(false),
+    copy_categoryParameter(),
     
     timbre_timeslice_size(0.01),
     timbre_dimension(20),

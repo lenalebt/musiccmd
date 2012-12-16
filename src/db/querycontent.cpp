@@ -318,13 +318,14 @@ bool export_category(music::DatabaseConnection* conn)
         }
         else if (categoryIDs.size() != 1)
         {   //too many
-            VERBOSE(0, "found more than one category for search string \"" << pOpt->show_chroma_scoresParameter << "\", aborting." << std::endl);
+            VERBOSE(0, "found more than one category for search string \"" << categoryName << "\", aborting." << std::endl);
             VERBOSE(0, "found categories:" << std::endl);
             for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
             {
                 databaseentities::Category cat;
-                conn->getCategoryByID(cat, *it);
-                VERBOSE(0, "   " << cat.getCategoryName());
+                cat.setID(*it);
+                conn->getCategoryByID(cat, false);
+                VERBOSE(0, "   " << cat.getCategoryName() << std::endl);
             }
             return false;
         }

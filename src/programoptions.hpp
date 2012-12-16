@@ -97,6 +97,9 @@ public:
     std::vector<std::string> export_categoryParameter;
     bool export_category_absolute_paths;
     
+    bool copy_category;
+    std::vector<std::string> copy_categoryParameter;
+    
     //options for feature extraction fine-tuning
     double       timbre_timeslice_size;
     unsigned int timbre_dimension;

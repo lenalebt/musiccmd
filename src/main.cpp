@@ -67,6 +67,14 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
+    if (!copy_category(conn))
+    {
+        ERROR_OUT("failed to copy category. aborting.", 0);
+        VERBOSE(3, "close database file \"" << pOpt->dbfile << "\"" << std::endl);
+        conn->close();
+        return EXIT_FAILURE;
+    }
+    
     if (!edit_category(conn, cProc))
     {
         ERROR_OUT("failed to edit category. aborting.", 0);

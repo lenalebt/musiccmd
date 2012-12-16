@@ -233,3 +233,104 @@ bool recalculate_category(music::DatabaseConnection* conn, music::Classification
     
     return true;
 }
+
+bool copy_category(music::DatabaseConnection* conn)
+{
+    ProgramOptions* pOpt = ProgramOptions::getInstance();
+    if (pOpt->copy_category)
+    {
+        if (pOpt->copy_categoryParameter.size() != 2)
+        {
+            VERBOSE(0, "you need to give exactly 2 parameters: the first is the "
+                << "name of the category to copy from, the second is the name of "
+                << "the (new) category to copy to." << std::endl);
+            return false;
+        }
+        
+        std::string fromCategoryName = pOpt->copy_categoryParameter[0];
+        std::string toCategoryName = pOpt->copy_categoryParameter[1];
+        
+        std::vector<databaseentities::id_datatype> categoryIDs;
+        databaseentities::id_datatype fromCategoryID;
+        conn->getCategoryIDsByName(categoryIDs, fromCategoryName);
+        
+        if (categoryIDs.size() == 0)
+        {   //not found
+            VERBOSE(0, "category not found: \"" << fromCategoryName << "\", aborting." << std::endl);
+            return false;
+        }
+        else if (categoryIDs.size() != 1)
+        {   //too many
+            VERBOSE(0, "found more than one category for search string \"" << fromCategoryName << "\", aborting." << std::endl);
+            VERBOSE(0, "found categories:" << std::endl);
+            for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+            {
+                databaseentities::Category cat;
+                cat.setID(*it);
+                conn->getCategoryByID(cat, false);
+                VERBOSE(0, "   " << cat.getCategoryName() << std::endl);
+            }
+            return false;
+        }
+        fromCategoryID = categoryIDs[0];
+        databaseentities::Category fromCategory;
+        fromCategory.setID(fromCategoryID);
+        conn->getCategoryByID(fromCategory, true);
+        
+        VERBOSE(0, "category to copy from: \"" << fromCategory.getCategoryName() << "\" (id: " << fromCategoryID << ")" << std::endl);
+        
+        conn->getCategoryIDsByName(categoryIDs, toCategoryName);
+        if (categoryIDs.size() != 0)
+        {   //too many
+            VERBOSE(0, "found categories with the same name as the new category \"" << toCategoryName << "\", aborting." << std::endl);
+            VERBOSE(0, "found categories:" << std::endl);
+            for (std::vector<databaseentities::id_datatype>::const_iterator it = categoryIDs.begin(); it != categoryIDs.end(); ++it)
+            {
+                databaseentities::Category cat;
+                cat.setID(*it);
+                conn->getCategoryByID(cat, false);
+                VERBOSE(0, "   " << cat.getCategoryName() << std::endl);
+            }
+            return false;
+        }
+        
+        
+        conn->beginTransaction();
+        music::databaseentities::Category toCategory;
+        toCategory.setID(-1);
+        toCategory.setCategoryName(toCategoryName);
+        databaseentities::CategoryDescription* fromDesc = fromCategory.getCategoryDescription();
+        databaseentities::CategoryDescription* desc = new databaseentities::CategoryDescription();
+        desc->setNegativeChromaModel(fromDesc->getNegativeChromaModel());
+        desc->setPositiveChromaModel(fromDesc->getPositiveChromaModel());
+        desc->setNegativeTimbreModel(fromDesc->getNegativeTimbreModel());
+        desc->setPositiveTimbreModel(fromDesc->getPositiveTimbreModel());
+        desc->setNegativeClassifierDescription(fromDesc->getNegativeClassifierDescription());
+        desc->setPositiveClassifierDescription(fromDesc->getPositiveClassifierDescription());
+        toCategory.setCategoryDescription(desc);
+        conn->addCategory(toCategory);
+        
+        //copy example scores (limited to 10000 examples for now)
+        std::vector<std::pair< databaseentities::id_datatype, double> > scoresAndIDs;
+        conn->getCategoryExampleRecordingIDs(scoresAndIDs, fromCategoryID, -1.1, 1.1, 10000);
+        for (std::vector<std::pair< databaseentities::id_datatype, double> >::const_iterator it=scoresAndIDs.begin(); it != scoresAndIDs.end(); ++it)
+        {
+            conn->updateCategoryExampleScore(toCategory.getID(), it->first, it->second);
+        }
+        
+        //copy song scores (limited to 1000000 songs for now)
+        std::vector<databaseentities::id_datatype> recordingIDs;
+        conn->getRecordingIDs(recordingIDs, 0, 1000000);
+        for (std::vector<databaseentities::id_datatype>::const_iterator it=recordingIDs.begin(); it != recordingIDs.end(); ++it)
+        {
+            double score=0.0;
+            //read score...
+            conn->getRecordingToCategoryScore(*it, fromCategory.getID(), score);
+            //write score...
+            conn->updateRecordingToCategoryScore(*it, toCategory.getID(), score);
+        }
+        
+        conn->endTransaction();
+    }
+    return true;
+}
